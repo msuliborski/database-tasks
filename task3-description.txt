@@ -1,0 +1,89 @@
+Use HR schema: Run hr_schema.sql script to create the database and tables. Then run hr_data.sql to populate this database with data.
+
+1. Determine the structure of all database's tables.
+
+2. Display names and salaries of employees.
+
+3. Display the last name and salary of employees earning more than $12,000.
+
+4. Display the last name and department number for employee number 176.
+
+5. Display the last name and salary for all employees whose salary is not in the range of $5,000 to $12,000.
+
+6. Display the last name, job ID, and start date (hire date) for the employees with the last names of Matos and Taylor. Order the query in ascending order by start date.
+
+
+
+7. Display the last name and department number of all employees in departments 20 or 50 in ascending alphabetical order by name.
+
+8. Display the last name and job title of all employees who do not have a manager.
+
+9. Display the last name, salary, and commission for all employees who earn commissions. Sort data in descending order of salary and commissions.
+
+ 
+
+10. Find the highest, lowest, sum, and average salary of all employees. Label the columns Maximum, Minimum, Sum, and Average, respectively.
+
+
+
+11. Modify the previous query to display the minimum, maximum, sum, and average salary for each job type (job_id).
+
+12. Display the number of people with the same job.
+
+
+
+13. Determine the number of managers without listing them. Label the column Number of Managers. Hint: Use the MANAGER_ID column to determine the number of managers.
+
+
+
+14. Find the difference between the highest and lowest salaries. Label the column DIFFERENCE.
+
+
+
+15. Find the addresses of all the departments. Use the LOCATIONS and COUNTRIES tables. Show the location ID, street address, city, state or province, and country in the output.
+
+
+
+16. Display the last name and department name for all employees.
+
+17. Display the last name, job, department number, and department name for all employees who work in Toronto.
+
+
+
+
+If you have time, complete the following exercises:
+
+1A. Create a report to display the manager number and the salary of the lowest-paid employee for that manager. Exclude and groups where the minimum salary is $6000 or less. Sort the output in descending order of salary.
+
+
+
+2A. The HR department wants to determine the names of all employees who were hired after Davies. Create a query to display the name and hire date of any employee hired after employee Davies.
+
+ ............ .............. 
+
+3A. The HR department needs to find the names and hire dates for all employees who were hired before their managers, along with their managers' names and hire dates
+
+
+
+.......
+
+
+
+4A. Create a report that displays the employee number, last name, and salary of all employees who earn more than the avarage salary. Sort the results in order of ascending salary.
+
+ ............................. 
+
+5A. Write a query that displays the employee number and last name of all employees who work in a depatrment with any employee whose last name starts with "U"
+
+
+
+6A. Create a report for HR that displays the last name and salary of every employee who reports to King.
+
+
+
+7A. For budgeting purposes, the HR depatrment needs a report on projected 10% raises. The report shoud display those employees who have no commisions
+
+
+
+...........
+

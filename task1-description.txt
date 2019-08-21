@@ -1,0 +1,19 @@
+Creating database using SQL statements
+
+1. Choose New Query option for opening SQL worksheet window.
+2. Define new database named test_yourname using CREATE DATABASE statement.
+3. Refresh Object Explorer panel to see your new database.
+4. Check the name of the database you are connected to. You can change a current database using the statement:
+5. USE database_name
+6. Define table named BANDS, which consists of the following columns: band_id – integer, primery key,  name – 7. varchar limited to 40 characters, origin_country -  varchar limited to 50 characters, formed_year – integer.
+8. Check the number of records in that table using SELECT count(*) … statement.
+9. Insert into the table one record: name: The Beatles, origin_country: England, formed_year 1960
+10. Display all the data using SELECT statement.
+11. Check the number of records in that table again.
+12. Create another table named MEMBERS consisted of: memeber_id - integer incremental from 100 by 1, band_id - int, surname - varchar limited to 60 characters, name varchar limited to 50 characters.
+13. Add foreign key on band_id column of MEMBERS table, which references BANDS table.
+14. Insert into that table 2 records for The Beatles band: John Lennon and Paul McCartney.
+15. Insert into BANDS table another record: name: Queen, origin_country: Great Britain, formed_year: 1971
+16. Insert another member: Freddie Mercury.
+17. Add constraint, which doesn’t allow entering year earlier than 1920.
+18. Add another record to ensure that the constraint works properly. 

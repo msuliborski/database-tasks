@@ -1,0 +1,28 @@
+Use test_empl schema: Run test_empl_schema.sql script to create the database and tables.
+Then run test_empl_data.sql to populate this database with data.
+1. Get names and salaries of employees
+2. Get names and daily salaries of employees
+3. Get names and yearly salaries of employees
+4. Get the minimal salary in the table employees
+5. Get the name, job, and salary of the employee with the smallest salary
+6. Get names, jobs and salaries of employees who earn less than the average salary in the
+enterprise
+7. For each department get the number of employees
+8. For each department and for each job get the number of employees
+9. Get names and salaries of employees who earn more than any employee working in
+depeartment 30
+10. For every employee get his name, salary and the difference between his salary and the
+average salary in the enterprise
+11. For every department get its name and the average salary
+12. Get the name, id_dep and salary of employees who earn more than the average salary in
+their departments
+13. Get the names of employees who have subordinate employees
+14. Get the identifier and the name of the department without employees
+15. Insert a new employee with the following attributes: (num_id -9781, Name -Hurst, job -
+ACCOUNTANT, boss - 9235, start_date - today, salary 1150, id_dep – 70)
+16. Insert a new employee with the following attributes: (num_id -9782, Name -Cooper, job -
+LOGISTICIAN, boss - 9332, start_date - today+12 days, salary 1200)
+17. Change the job of operators to sellers in department 50 and increase their salary by 10%
+18. For all employees who have subordinate employees increase the bonus by 10% of the
+smallest salary
+19. Delete the logistician with the shortest period of employment

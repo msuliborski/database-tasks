@@ -1,0 +1,120 @@
+Use HR schema: Run hr_schema.sql script to create the database and tables. Then run hr_data.sql to populate this database with data.
+
+
+1. Show last names and numbers of all managers together with the number of employees that are his / her subortinates.
+
+
+
+2. Create a report that displays the department name, location name, job title and salary of those employeses who work in a specific (given) location.
+
+
+
+
+3. Find the number of employees who have a last name that ends with the letter n.
+
+
+
+
+
+4. Create a report that shows the name, location and the number of employees for each department. Make sure that report also includes departments without employees.
+
+
+ ...    
+
+
+5. Show all employees who were hired in the first five days of the month (before the 6th of the month).
+
+
+
+
+
+
+6. Create a report to display the department number and lowest salary of the department with the highest average salary.
+
+
+
+
+
+7. Create a report that displays department where no sales representatives work. Include the deprtment number, department name and location in the output.
+
+
+
+
+
+8. Display the depatrment number, department name and the number of employees for the department:
+a. with the highest number of employees.
+
+
+
+
+
+b. with the lowest number of employees
+
+
+
+
+
+c. that employs fewer than three employees.
+
+
+
+
+
+9. Display years and total numbers of employees that were employed in that year.
+
+
+
+10. Display countries and number of locations in that country.
+
+
+
+If you have time, complete the following exercises:
+
+
+
+A1. Create a query to display the employees who earn a salary that is higher than the salary of all the sales managers (JOB_ID = 'SA_MAN'). Sort the results from the highest to the lowest.
+
+
+
+
+
+A2. Display details such as the employee ID, last name, and department ID of those employees who works in cities the names of which begin with 'T'.
+
+
+
+
+A3. Write a query to find all employees who earn more than the average salary in their
+
+
+   ...   
+
+
+A4. Find all employees who are not sumervisors (managers). Do this using the NOT EXISTS operator.
+
+
+   ...   
+
+Can it be done using NOT IN operator?
+
+
+A5. Display the last names of the employees who earn less than the average salary in their departments.
+
+
+   ...   
+
+
+A6. Display the last names of the employees who have one or more coworkers in their departments with later hire dates but higher salaries.
+
+
+   ...   
+
+
+A7. Display the department names of those depatrments whose total salary cost is above one-eight (1/8) of the total salary cost od the whole company. Use the WITH clause to write this query. Name the query SUMMARY.
+
+
+
+
+
+A8. Delete the oldest JOB_HISTORY row of an employee by looking up the JOB_HISTORY table for the MIN(START_DATE) for the employee. Delete the records of only those employees who have changed at least two jobs.
+
+

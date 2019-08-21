@@ -1,0 +1,73 @@
+1. Create a database named LIBRARY (as shown at schema on the next page). Give names to all the constraints (except NULL constraints). The properties of the tables are defined as follows:
+
+    MEMEBERS table
+
+       CardNo - 5 characters, primary key,
+
+       Surname -  up to 15 characters,
+
+       Name – as above,
+
+       Address –up to 150 characters,
+
+       Name, Surname, Birthday_date – not null,
+
+       Gender - 1 char: M or F letter,
+
+       Phone_No – up to 15 characters.
+
+    Employees table
+
+       emp_id - primery key with identity set (seed = 1, incerement=1) ,
+
+       Surname, Name and Birthday_date are not null,
+
+       birthday date must be earlier than date of employment (Emp_Date),
+
+    Publishers table
+
+       pub_id is a primary key with identity set (seed=1, incerement=1),
+
+       Name, City, - not null, up to 50 characters,
+
+       Phone_No - up to 15 charakters,
+
+    Books table
+
+       BookID - primary key, 5 characters,
+
+       Pub_ID - foreign key related to Publishers,
+
+       Type - charaters, must contain one of the following values: novel, historical, for kids, poems, crime story, science fiction, science
+
+       Price is a currency field (money), not null,
+
+       Title - up to 40 characters, not null,
+
+    BOOK_LOANS table
+
+       LoanID  - integer with identity set (seed = 1, increment = 1), primary key,
+
+       CardNo, BookID and emp_id are foreign keys related to Members, Books and Employees,
+
+       DateOut must be earlier than DueDate,
+
+       Penalty can't contain negative values, default is set to 0 (zero),
+
+ 
+
+ 
+
+2. Create database diagram and check it corectness (compare with a diagram above).
+
+3. Add data from the script (library_eng_data.sql). In case of errors, check the defined structure again..
+
+4. There is Gender field in Employees table omitted (it should contain 'F' or "M' value). Correct this mistake.
+
+5. Change Book_loans tabel - add another constraint, that enforces uniqueness of  a pair of values : BookID and DateOut. 
+
+
+Additional practice
+
+Create a database according to the following diagram and requirements. Populate database using video_popul.sql script. In case of errors, correct the structure.
+
