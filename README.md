@@ -1,5 +1,5 @@
 # SQL Tasks
-SQL tasks. Database Systems (2019).
+SQL tasks. Database Systems (2019) & Database Programming (2020).
 
 ## Getting Started
 
@@ -8,7 +8,7 @@ These instructions will get you a copy of the project up and running on your loc
 ### Cloning
 
 ```
-$ git clone https://github.com/msuliborski/dishwasher-simulation
+$ git clone https://github.com/msuliborski/sql-tasks
 ```
 
 ## Authors
