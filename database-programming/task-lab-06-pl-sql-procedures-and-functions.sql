@@ -1,0 +1,22 @@
+-- 1. Create a procedure called ADD_JOB to insert a new job into the JOBS table. Provide the ID and job title using two parameters. invoke the procedure with IT_DBA as the job ID and Database Administrator as the job title. Query the JOBS table and view the results.
+-- 2. Invoke your procedure again, passing a job ID of ST_MAN and a job title of Stock Manager. What happens and why? Handle the exception.
+-- 3. Create a procedure called UPD_JOB to update the job title. Provide the job ID and a new title using two parameters. Include the necessary exception handling if no update occurs. Invoke the procedure to change the job title of the job ID IT_DBA to Data Administrator. Query the JOBS table and view the results.
+    -- Test the exception-handling section of the procedure by trying to update a job that does not exist. You can use the job ID IT_WEB and the job title Web Master.
+-- 4. Create a procedure called DEL_JOB to delete a job. Include the necessary exception-handling code if no job is deleted. Invoke the procedure using the job ID IT_DBA. Query the JOBS table and view the results.
+    -- Test the exception-handling section of the procedure by trying to delete a job that does not exist. Use IT_WEB as the job ID.
+-- 5. Create a procedure that returns a value from the SALARY and JOB_ID columns for a specified employee ID. Execute the procedure using an anonymous block with variables for the two OUT parameters—one for the salary and the other for the job ID. Display the salary and job ID for employee ID 120.
+    -- Invoke the procedure again, passing an EMPLOYEE_ID of 300 - handle the exception.
+-- 6. Create a function called GET_ANNUAL_COMP to return the annual salary computed from an employee’s monthly salary and commission passed as parameters. Use the function in a SELECT statement against the EMPLOYEES table for employees in department 30.
+-- 7. Create a procedure, ADD_EMPLOYEE, to insert a new employee into the EMPLOYEES table. The procedure should call a VALID_DEPTID function to check whether the department ID specified for the new employee exists in the DEPARTMENTS table.
+    -- Provide the following parameters:
+        -- - first_name
+        -- - last_name
+        -- - email
+        -- - job: Use 'SA_REP' as the default.
+        -- - mgr: Use 145 as the default.
+        -- - sal: Use 1000 as the default.
+        -- - comm: Use 0 as the default.
+        -- - deptid: Use 30 as the default.
+        -- - Use the EMPLOYEES_SEQ sequence to set the employee_id column.
+        -- - Set the hire_date column to TRUNC(SYSDATE).
+-- 8. Call ADD_EMPLOYEE for the name 'Jane Harris' in department 15 and e-mail 'JAHARRIS', leaving other parameters with their default values. Handle an appropriate exception / exceptions.
