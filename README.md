@@ -1,4 +1,5 @@
 # SQL Tasks
+
 SQL tasks. Database Systems (2019) & Database Programming (2020).
 
 ## Getting Started
