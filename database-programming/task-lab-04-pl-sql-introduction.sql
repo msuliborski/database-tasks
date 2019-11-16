@@ -1,12 +1,36 @@
 -- 1. View  commands for the DBMS_OUTPUT package by using DESC statement.
 -- 2. Set the SERVEROUTPUT variable that will display messages.
--- 3. Create an anonymous block that prints (displays) "Hi, it's me" (you can print strings, DATEs and NUMBERs, for  others: TO_CHAR (.....)). Use the DBMS_OUTPUT package.
--- 4. Create an anonymous block that includes: declaration of a numeric variable, assigning a value and printing the value (VARIABLE = ......)
--- 5. Create an anonymous block with 2 variables that prints (displays) a greeting, today’s date and tomorrow’s date. Sample output is as follows:
+SET SERVEROUTPUT ON;
+
+-- 3. Create an anonymous block that prints (displays) "Hi, it's me" (you can print strings, DATEs and NUMBERs, 
+--for  others: TO_CHAR (.....)). Use the DBMS_OUTPUT package.
+BEGIN
+  DBMS_OUTPUT.PUT_LINE('Hi, it''s me ');
+END;
+
+-- 4. Create an anonymous block that includes: declaration of a numeric variable, a
+--ssigning a value and printing the value (VARIABLE = ......)
+DECLARE
+    a NUMBER(10) := 15;
+BEGIN
+  DBMS_OUTPUT.PUT_LINE(a);
+END;
+
+-- 5. Create an anonymous block with 2 variables that prints (displays) a greeting, today’s date 
+--and tomorrow’s date. Sample output is as follows:
     -- Hello, Agnieszka.
     -- Today is: 24-OCT-2019
     -- Tomorrow is 25-OCT-2019
+DECLARE
+    today DATE := SYSDATE;
+    tomorrow DATE := SYSDATE + 1;
+BEGIN
+  DBMS_OUTPUT.PUT_LINE('Hello, Agnieszka');
+  DBMS_OUTPUT.PUT_LINE('Today is: ' || today);
+  DBMS_OUTPUT.PUT_LINE('Tomorrow is: ' || tomorrow);
+END; 
 -- 6. Change the line that prints “Hello …” to print “Hello” and the first name of the employee, which identifier is provided by the user. Include his/her salary in the output.
+
 -- 7. Create a new depts table as a copy of departments table.
 -- 8. Create a PL/SQL block that selects the maximum department ID in the depts table and stores it in the v_max_deptno variable. Display the maximum department ID.
 -- 9. Create a PL/SQL block that inserts a new department into the depts table. Assign 'Education' to department_name. Add 10 to the maximum existing department ID to get a new department_id. The location can be NULL.
@@ -26,7 +50,6 @@
 
 2, 3, 4, 5)
 
-SET SERVEROUTPUT ON;
 DECLARE 
     first_name VARCHAR2 (30) := 'Agnieszka';
     today DATE := SYSDATE;
