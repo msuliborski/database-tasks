@@ -2,11 +2,11 @@ set pages 0 feed off veri off lines 500
 
 accept oldname prompt "Enter username to create like: "
 accept newname prompt "Enter new user name: "
--- accept psw prompt "Enter new user's password: "
+accept psw prompt "Enter new user's password: "
 
 -- Create user...
-select 'create user &&newname identified by values '''||password||''''||
--- select 'create user &&newname identified by &psw'||
+-- select 'create user &&newname identified by values '''||password||''''||
+select 'create user &&newname identified by &psw'||
 ' default tablespace '||default_tablespace||
 ' temporary tablespace '||temporary_tablespace||' profile '||
 profile||';'
@@ -37,7 +37,7 @@ from sys.dba_col_privs
 where grantee = upper('&&oldname');
 
 -- Tablespace Quotas...
-select 'alter user '||username||' quota '||
+select 'alter user &&newname quota '||
 decode(max_bytes, -1, 'UNLIMITED', max_bytes)||
 ' on '||tablespace_name||';'
 from sys.dba_ts_quotas
