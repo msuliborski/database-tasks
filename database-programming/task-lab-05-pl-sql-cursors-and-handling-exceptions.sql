@@ -5,14 +5,14 @@
     -- In the executable section, get all the information from the countries table by using v_countryid. Display selected information about the country.
 DECLARE
     TYPE r_countries IS RECORD (
-        country_id      hr.countries.country_id%TYPE,
-        country_name    hr.countries.country_name%TYPE,
-        region_id       hr.countries.region_id%TYPE );
-    v_countryid hr.countries.country_id%TYPE := 'CA';
+        country_id      countries.country_id%TYPE,
+        country_name    countries.country_name%TYPE,
+        region_id       countries.region_id%TYPE );
+    v_countryid countries.country_id%TYPE := 'CA';
     v_country_record r_countries;
   
 BEGIN
-  select * into v_country_record from hr.countries
+  select * into v_country_record from countries
   where country_id = v_countryid;
   
   dbms_output.put_line( v_country_record.country_id || ' ' ||
@@ -27,7 +27,7 @@ END;
 declare
     v_deptno number := 10;
     cursor c_emp_cursor is
-        select last_name, salary, manager_id from hr.employees
+        select last_name, salary, manager_id from employees
         where department_id = v_deptno;
     v_emp_record c_emp_cursor%rowtype;
 begin
@@ -51,7 +51,7 @@ declare
     v_max_emps number := 5;
     v_curr_emps number;
     cursor c_emp_cursor is
-        select last_name, salary from hr.employees
+        select last_name, salary from employees
         order by salary desc;
     v_emp_record c_emp_cursor%rowtype;
 begin
@@ -69,11 +69,11 @@ end;
 -- 4. Write a PL/SQL block, which declares and uses cursors with parameters. In a loop, use a cursor to retrieve the department number and the department name from the departments table for a department whose department_id is less than 100. Pass the department number to another cursor as a parameter to retrieve from the employees table the details of employee last name, job, hire date, and salary of those employees whose employee_id is less than 120 and who work in that department.
 declare
     cursor c_deps is 
-        select department_id, department_name from hr.departments
+        select department_id, department_name from departments
         where department_id < 100;
     v_deps c_deps%rowtype;    
-    cursor c_emps(dep_id hr.departments.department_id%type) is 
-        select last_name, job_id, hire_date, salary from hr.employees
+    cursor c_emps(dep_id departments.department_id%type) is 
+        select last_name, job_id, hire_date, salary from employees
         where department_id = dep_id and employee_id < 120; 
     v_emps c_emps%rowtype;    
 begin
@@ -95,10 +95,10 @@ end;
 
 -- 5. Write a PL/SQL block to select the name of the employee with a given salary value. If the salary entered returns only one row, display employee’s name and the salary amount. If the salary entered does not return any rows or returns more than one row, handle the exception with appropriate exception handlers and messages.
 declare 
-    v_sal hr.employees.salary%type := 17000; -- 17000, 24000, 24123
-    v_name hr.employees.last_name%type;    
+    v_sal employees.salary%type := 17000; -- 17000, 24000, 24123
+    v_name employees.last_name%type;    
 begin
-    select last_name into v_name from hr.employees
+    select last_name into v_name from employees
     where salary = v_sal; 
     dbms_output.put_line(v_name || ', salary: ' || v_sal);
 exception
@@ -110,11 +110,11 @@ end;
 
 -- 6. Use the Oracle server error ORA-02292 (integrity constraint violated – child record found) to practice how to declare exceptions with a standard Oracle Server error. Create a PL/SQL block that deletes department with employees assigned. Handle the exception.
 declare
-    v_dep_id hr.departments.department_id%type := 60;
+    v_dep_id departments.department_id%type := 60;
     e_dep_has_emps exception;
     pragma exception_init (e_dep_has_emps, -2292);
 begin
-    delete from hr.departments
+    delete from departments
     where department_id = v_dep_id;
 exception
     when e_dep_has_emps then
