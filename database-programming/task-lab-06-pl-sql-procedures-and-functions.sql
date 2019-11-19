@@ -1,4 +1,15 @@
 -- 1. Create a procedure called ADD_JOB to insert a new job into the JOBS table. Provide the ID and job title using two parameters. invoke the procedure with IT_DBA as the job ID and Database Administrator as the job title. Query the JOBS table and view the results.
+create or replace procedure add_job(id hr.jobs.job_id%type, title hr.jobs.job_title%type) is 
+begin
+    select * from hr.employees
+    -- insert into hr.jobs
+    -- values (id, title, null, null);
+end;
+
+begin
+    add_job('IT_DBA', 'Database Administrator');
+end;
+
 -- 2. Invoke your procedure again, passing a job ID of ST_MAN and a job title of Stock Manager. What happens and why? Handle the exception.
 -- 3. Create a procedure called UPD_JOB to update the job title. Provide the job ID and a new title using two parameters. Include the necessary exception handling if no update occurs. Invoke the procedure to change the job title of the job ID IT_DBA to Data Administrator. Query the JOBS table and view the results.
     -- Test the exception-handling section of the procedure by trying to update a job that does not exist. You can use the job ID IT_WEB and the job title Web Master.

@@ -95,46 +95,14 @@ exception
 end;
 
 -- 6. Use the Oracle server error ORA-02292 (integrity constraint violated – child record found) to practice how to declare exceptions with a standard Oracle Server error. Create a PL/SQL block that deletes department with employees assigned. Handle the exception.
-
-
-
-
-
-
-
-
-
-
-
-
--- NOT MINE
---Write a PL/SQL block to select the name of the employee with a given salary value. If the salary entered returns only one row, display employee’s name and the salary amount. If the salary entered does not return any rows or returns more than one row, handle the exception with appropriate exception handlers and messages.
-DECLARE
-    v_salary        employees.salary%TYPE := 36271;
-    v_employee_name employees.last_name%TYPE;
-BEGIN
-    SELECT last_name
-    INTO v_employee_name
-    FROM employees
-    WHERE salary = v_salary;
-    dbms_output.PUT_LINE('Employee ' || v_employee_name || ' has a salary of ' || v_salary);
-EXCEPTION
-    WHEN no_data_found THEN
-        dbms_output.PUT_LINE('No employees with a salary of ' || v_salary);
-    WHEN too_many_rows THEN
-        dbms_output.PUT_LINE('More than one employee with a salary of ' || v_salary);
-END;
-
---Use the Oracle server error ORA-02292 (integrity constraint violated – child record found) to practice how to declare exceptions with a standard Oracle Server error. Create a PL/SQL block that deletes department with employees assigned. Handle the exception.
-DECLARE
-    v_dep_id departments.department_id%TYPE := 60;
-    e_dep_has_employees EXCEPTION;
-    PRAGMA EXCEPTION_INIT (e_dep_has_employees, -2292);
-BEGIN
-    DELETE
-    FROM departments
-    WHERE department_id = v_dep_id;
-EXCEPTION
-    when e_dep_has_employees THEN
-        dbms_output.PUT_LINE('Cannot delete department no. ' || v_dep_id || ', because some employees are assigned to it.');
-END;
+declare
+    v_dep_id hr.departments.department_id%type := 60;
+    e_dep_has_emps exception;
+    pragma exception_init (e_dep_has_emps, -2292);
+begin
+    delete from hr.departments
+    where department_id = v_dep_id;
+exception
+    when e_dep_has_emps then
+        dbms_output.put_line('Cannot delete department no. ' || v_dep_id || ', because it has employees assigned.');
+end;
