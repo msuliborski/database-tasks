@@ -100,9 +100,55 @@
         order by employee_id desc;
 
 -- 4. You are asked to prevent employees from being deleted during business hours. Write a statement trigger called DELETE_EMP_TRG on the EMPLOYEES table to prevent rows from being deleted during weekday business hours, which are from 9:00 AM to 6:00 PM.
+        create or replace trigger delete_emp_trg 
+        before delete on employees
+        begin 
+            if not to_char(sysdate, 'HH:MM:SS') between '09:00:00' and '18:00:00' then
+                raise_application_error(-20000, 'Deleting employees in business hours is forbidden');
+            end if;
+        end;
+
 -- Test the trigger with different cases.
+        delete from employees
+        where employee_id = (select max(employee_id) from employees);
+        
+        select * from employees
+        order by employee_id desc;
 
 -- 5. Create a trigger called CHECK_SAL_RANGE that is fired before every row that is updated in the MIN_SALARY and MAX_SALARY columns in the JOBS table. For any minimum or maximum salary value that is changed, check whether the salary of any existing employee with that job ID in the EMPLOYEES table falls within the new range of salaries specified for this job ID. Include exception handling to cover a salary range change that affects the record of any existing employee.
+    create or replace trigger check_sal_range_trg
+    before update of max_salary, min_salary on jobs 
+    for each row
+    cursor c_sal is
+        select salary from employees
+        where job_id = :old.job_id
+    v_sal_of_emps c_sal%rowtype; 
+    begin
+        if :new.min_salary <> :old.min_salary or :new.max_salary <> :old.max_salary then
+            open c_sal;
+            loop
+                fetch c_sal into v_sal_of_emps;
+                exit when c_sal%notfound;
+                if :new.min_salary > :new.max_salary then
+                    min_sal_bigger_than_max
+                elsif :new.min_salary > v_sal_of_emps.salary then
+                    min_sal_too_big
+                elsif :new.max_salary < v_sal_of_emps.salary then
+                    max_sal_too_small
+                end if;
+            end loop
+            close c_sal;
+        end if;
+
+    exception
+      when min_sal_too_big then
+            dbms_output.putline('') ;
+      when max_sal_too_small then
+            dbms_output.putline('') ;
+      when min_sal_bigger_than_max then
+            dbms_output.putline('') ;
+    end;
+
 -- Test the trigger using different cases.
 
  
