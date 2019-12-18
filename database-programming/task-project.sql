@@ -246,17 +246,16 @@ TODO:
 
     create or replace procedure add_extra_costs (p_added_amount number,
                                                 p_reservation_id number) is 
-    v_current_extra_costs number;
     v_payment_status reservations.payment_status%type;
     begin
 
-        select payment_status, extra_costs into v_payment_status, v_current_extra_costs from reservations where reservation_id = p_reservation_id;
+        select payment_status into v_payment_status from reservations where reservation_id = p_reservation_id;
 
         if v_payment_status != 'pending' then
             raise_application_error(-20002, 'Cannot add additional costs');
         end if;
 
-        update reservations set extra_costs = v_current_extra_costs + p_added_amount
+        update reservations set extra_costs = extra_costs + p_added_amount
         where reservation_id = p_reservation_id;
     
     end;
