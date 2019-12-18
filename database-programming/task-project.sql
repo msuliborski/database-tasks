@@ -321,11 +321,11 @@ TODO:
         loop
           FETCH c_res_cursor INTO r_res;
           EXIT when c_res_cursor%NOTFOUND;
-          IF (r_res.payment_status = 'paid' AND p_year = TO_CHAR(r_res.check_out_date, 'YYYY')) THEN
+         IF (r_res.payment_status = 'paid' AND p_year = TO_CHAR(r_res.check_out_date, 'YYYY')) THEN
             SELECT costs_per_day INTO v_costs_per_day FROM ROOMS r WHERE r.room_id = r_res.room_id;
             v_costs_per_day := v_costs_per_day * (r_res.check_out_date - r_res.check_in_date);
-            v_revenues := v_revenues + v_costs_per_day;
-          END IF;
+            v_revenues := v_revenues + v_costs_per_day + r_res.extra_costs;
+        END IF;
         end loop; 
         CLOSE c_res_cursor;
         RETURN v_revenues;
