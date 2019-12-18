@@ -358,21 +358,11 @@ TODO:
         return 0;
     end;
 
-    
-    CREATE OR REPLACE FUNCTION GET_RESERVATION_COST(p_reservation_row reservations%rowtype)
-    RETURN ROOMS.costs_per_day%type
-    IS
-    v_reservation_cost ROOMS.costs_per_day%type;
-    BEGIN
-        SELECT costs_per_day INTO v_reservation_cost FROM ROOMS r WHERE r.room_id = p_reservation_row.room_id;
-        v_reservation_cost := v_reservation_cost * (p_reservation_row.check_out_date - p_reservation_row.check_in_date) + p_reservation_row.extra_costs;
-       RETURN v_reservation_cost;
-    END;
-
     CREATE OR REPLACE FUNCTION GET_ANN_REVENUES(p_year VARCHAR2)
     RETURN ROOMS.costs_per_day%type
     IS
     v_revenues NUMBER := 0;
+    v_costs_per_day NUMBER;
     CURSOR c_res_cursor IS SELECT * FROM reservations;
     r_res reservations%rowtype;
     BEGIN
@@ -381,7 +371,9 @@ TODO:
           FETCH c_res_cursor INTO r_res;
           EXIT when c_res_cursor%NOTFOUND;
          IF (r_res.payment_status = 'paid' AND p_year = TO_CHAR(r_res.check_out_date, 'YYYY')) THEN
-            v_revenues := v_revenues + GET_RESERVATION_COST(r_res);
+            SELECT costs_per_day INTO v_costs_per_day FROM ROOMS r WHERE r.room_id = r_res.room_id;
+            v_costs_per_day := v_costs_per_day * (r_res.check_out_date - r_res.check_in_date);
+            v_revenues := v_revenues + v_costs_per_day + r_res.extra_costs;
         END IF;
         end loop; 
         CLOSE c_res_cursor;
