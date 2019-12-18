@@ -12,7 +12,7 @@
 
 -- Grade 4
     -- - all requirements for the assessment of 3, plus:
-    -- - definitions of procedures and functions should prove your high database skills (complexity, "if" statements, loops, cursors, handling exceptions ...) and should differ in data they work on, operations they perform, and attributes they accept.
+    -- - definitions of procedures and functions should prove your high database skills (complexity, 'if' statements, loops, cursors, handling exceptions ...) and should differ in data they work on, operations they perform, and attributes they accept.
 
 -- Grade 5
     -- - all requirements for the assessment of 4, plus:
@@ -26,9 +26,16 @@
 CREATE TABLE jobs ( 
     job_id          NUMBER NOT NULL PRIMARY KEY, 
     job_title       VARCHAR2(35) NOT NULL, 
-    min_salary      NUMBER(6), 
+    min_salary      NUMBER(6),
     max_salary      NUMBER(6)
 );
+
+INSERT INTO jobs VALUES (1, 'Owner', null, null);
+INSERT INTO jobs VALUES (2, 'Flat surfaces maintainer', null, null);
+INSERT INTO jobs VALUES (3, 'Doorkeeper ', null, null);
+INSERT INTO jobs VALUES (4, 'Junior assistant', null, null);   
+
+
 
 CREATE TABLE employees ( 
     employee_id     NUMBER NOT NULL PRIMARY KEY, 
@@ -37,13 +44,27 @@ CREATE TABLE employees (
     email           VARCHAR2(25) NOT NULL,
     phone_number    VARCHAR2(20) NOT NULL, 
     hire_date       DATE NOT NULL,
-    salary          NUMBER(8), 
+    salary          NUMBER(8),
     job_id          NUMBER NOT NULL,
     supervisor_id   NUMBER, 
     CONSTRAINT      e_s_min         CHECK (salary > 0), 
     CONSTRAINT      e_j_fk          FOREIGN KEY (job_id) REFERENCES jobs (job_id), 
     CONSTRAINT      e_s_fk          FOREIGN KEY (supervisor_id) REFERENCES employees
 );
+
+INSERT INTO employees VALUES (1, 'Jan', 'Kowalski', 'sking@hotel.com', '+48 123 456 789', TO_DATE('2015-12-01', 'yyyy-mm-dd'), 8900, 1, null);
+
+INSERT INTO employees VALUES (2, 'Neena', 'Kochhar', 'asdhf@hotel.com', '+48 123 456 789', TO_DATE('2015-12-01', 'yyyy-mm-dd'), 2500, 2, 1);
+INSERT INTO employees VALUES (3, 'Diana', 'Lorentz', 'sking@hotel.com', '+48 123 456 789', TO_DATE('2015-12-01', 'yyyy-mm-dd'), 2500, 2, 1);
+
+INSERT INTO employees VALUES (4, 'Alexander', 'Hunold', 'asdfg@hotel.com', '+48 123 456 789', TO_DATE('2015-12-01', 'yyyy-mm-dd'), 3900, 3, 1);
+INSERT INTO employees VALUES (5, 'Bruce', 'Ernst', 'sbhikf@hotel.com', '+48 123 456 789', TO_DATE('2015-12-01', 'yyyy-mm-dd'), 3900, 3, 1);
+INSERT INTO employees VALUES (6, 'David', 'Austin', 'efyn@hotel.com', '+48 123 456 789', TO_DATE('2016-06-01', 'yyyy-mm-dd'), 3900, 3, 1);
+
+INSERT INTO employees VALUES (7, 'Nancy', 'Valli', 'juynh@hotel.com', '+48 123 456 789', TO_DATE('2019-09-01', 'yyyy-mm-dd'), 1500, 4, 5);
+INSERT INTO employees VALUES (8, 'Daniel', 'Greenberg', 'tyb@hotel.com', '+48 123 456 789', TO_DATE('2019-11-01', 'yyyy-mm-dd'), 1500, 4, 6);
+
+
 
 CREATE TABLE guests ( 
     guest_id        NUMBER NOT NULL PRIMARY KEY, 
@@ -54,6 +75,13 @@ CREATE TABLE guests (
     CONSTRAINT      g_p_e_nn  CHECK (email IS NOT NULL OR phone_number IS NOT NULL)
 );
 
+INSERT INTO guests VALUES (1, 'John', 'Chen', 'bbbbdf@hotel.com', '+48 123 456 789');
+INSERT INTO guests VALUES (2, 'Ismael', 'Sciarra', 'reberb@hotel.com', '+48 123 456 789');
+INSERT INTO guests VALUES (3, 'Luis', 'Popp', 'erb234@hotel.com', '+48 123 456 789');
+INSERT INTO guests VALUES (4, 'Den', 'Raphaely', 'ss2s34@hotel.com', '+48 123 456 789');
+INSERT INTO guests VALUES (5, 'Alexander', 'Khoo', 'ewfumyntbr@hotel.com', '+48 123 456 789');
+
+
 
 CREATE TABLE beds ( 
     bed_id          NUMBER NOT NULL PRIMARY KEY,
@@ -61,35 +89,97 @@ CREATE TABLE beds (
     capacity        NUMBER(1) NOT NULL
 );
 
+INSERT INTO beds VALUES (1, 'for kids', 1);
+INSERT INTO beds VALUES (2, 'sofa', 1);
+INSERT INTO beds VALUES (3, 'sofa', 2);
+INSERT INTO beds VALUES (4, 'normal', 1);
+INSERT INTO beds VALUES (5, 'normal', 2);
+INSERT INTO beds VALUES (6, 'luxurious', 1);
+INSERT INTO beds VALUES (7, 'luxurious', 2);
+
+
+
 CREATE TABLE rooms ( 
     room_id         NUMBER NOT NULL PRIMARY KEY, 
     capacity        NUMBER(2) NOT NULL, 
     has_bathroom    NUMBER(1,0) DEFAULT 0,
     smoking_allowed NUMBER(1,0) DEFAULT 0,
     pets_allowed    NUMBER(1,0) DEFAULT 0,
+    costs_per_day   NUMBER(6) NOT NULL,
     maintainer_id   NUMBER,
     CONSTRAINT      r_m_fk  FOREIGN KEY (maintainer_id) REFERENCES employees
 );
 
+INSERT INTO rooms VALUES (1, 3, 0, 1, 1, 50, 2);
+INSERT INTO rooms VALUES (2, 5, 1, 1, 1, 100, 2);
+INSERT INTO rooms VALUES (3, 8, 1, 0, 0, 200, 2);
+INSERT INTO rooms VALUES (4, 8, 1, 0, 0, 250, 2);
+INSERT INTO rooms VALUES (5, 1, 1, 1, 1, 60, 3);
+INSERT INTO rooms VALUES (6, 1, 1, 1, 1, 60, 3);
+INSERT INTO rooms VALUES (7, 1, 1, 1, 1, 80, 3);
+INSERT INTO rooms VALUES (8, 1, 1, 1, 1, 150, 3);
+INSERT INTO rooms VALUES (9, 2, 1, 1, 1, 250, 3);
+
+
+
 CREATE TABLE bedsToRooms ( 
     bed_id          NUMBER,
     room_id         NUMBER,
+    amount          NUMBER,
     CONSTRAINT      b_b_i_fk  FOREIGN KEY (bed_id) REFERENCES beds,
     CONSTRAINT      b_r_i_fk  FOREIGN KEY (room_id) REFERENCES rooms
 );
+
+INSERT INTO bedsToRooms VALUES (1, 1, 1);
+INSERT INTO bedsToRooms VALUES (1, 3, 1);
+
+INSERT INTO bedsToRooms VALUES (2, 4, 1);
+INSERT INTO bedsToRooms VALUES (2, 5, 2);
+
+INSERT INTO bedsToRooms VALUES (3, 1, 8);
+
+INSERT INTO bedsToRooms VALUES (4, 4,8);
+
+INSERT INTO bedsToRooms VALUES (5, 4, 1);
+
+INSERT INTO bedsToRooms VALUES (6, 4, 1);
+
+INSERT INTO bedsToRooms VALUES (7, 4, 2);
+
+INSERT INTO bedsToRooms VALUES (8, 6, 1);
+
+INSERT INTO bedsToRooms VALUES (9, 7, 1);
+
+
 
 CREATE TABLE reservations ( 
     reservation_id  NUMBER NOT NULL PRIMARY KEY,
     check_in_date   DATE NOT NULL,
     check_out_date  DATE NOT NULL,
-    room_costs      NUMBER(6) NOT NULL,
     extra_costs     NUMBER(6),
     payment_status  VARCHAR2(10) NOT NULL CHECK (payment_status IN ('pending', 'paid', 'canceled')),
-    guest_id        NUMBER NOT NULL,
     room_id         NUMBER NOT NULL,
+    guest_id        NUMBER NOT NULL,
     CONSTRAINT      r_gt_i_fk     FOREIGN KEY (guest_id) REFERENCES guests,
     CONSTRAINT      r_r_i_fk      FOREIGN KEY (room_id) REFERENCES rooms
 );
+
+INSERT INTO reservations VALUES (1, TO_DATE('2019-12-01', 'yyyy-mm-dd'), TO_DATE('2019-12-08', 'yyyy-mm-dd'), 50, 'paid', 7, 1);
+INSERT INTO reservations VALUES (2, TO_DATE('2019-12-14', 'yyyy-mm-dd'), TO_DATE('2020-01-02', 'yyyy-mm-dd'), 300, 'pending', 9, 1);
+
+INSERT INTO reservations VALUES (3, TO_DATE('2018-11-14', 'yyyy-mm-dd'), TO_DATE('2018-11-30', 'yyyy-mm-dd'), 0, 'paid', 7, 2);
+INSERT INTO reservations VALUES (4, TO_DATE('2019-12-14', 'yyyy-mm-dd'), TO_DATE('2019-12-30', 'yyyy-mm-dd'), 50, 'pending', 7, 2);
+
+INSERT INTO reservations VALUES (5, TO_DATE('2019-12-01', 'yyyy-mm-dd'), TO_DATE('2019-01-08', 'yyyy-mm-dd'), 0, 'pending', 1, 3);
+
+INSERT INTO reservations VALUES (6, TO_DATE('2019-12-01', 'yyyy-mm-dd'), TO_DATE('2019-12-30', 'yyyy-mm-dd'), 0, 'pending', 3, 4);
+INSERT INTO reservations VALUES (7, TO_DATE('2019-12-01', 'yyyy-mm-dd'), TO_DATE('2019-12-30', 'yyyy-mm-dd'), 1000, 'pending', 4, 4);
+INSERT INTO reservations VALUES (8, TO_DATE('2019-12-01', 'yyyy-mm-dd'), TO_DATE('2019-12-30', 'yyyy-mm-dd'), 100, 'pending', 5, 4);
+INSERT INTO reservations VALUES (9, TO_DATE('2019-12-01', 'yyyy-mm-dd'), TO_DATE('2019-12-30', 'yyyy-mm-dd'), 50, 'pending', 6, 4);
+
+INSERT INTO reservations VALUES (10, TO_DATE('2019-10-01', 'yyyy-mm-dd'), TO_DATE('2019-10-17', 'yyyy-mm-dd'), 50, 'paid', 2, 5);
+
+
 
 TODO: 
     at least 3 procedures performing different operations should be defined (e.g. for adding, modification, and retrieving data from the database)
