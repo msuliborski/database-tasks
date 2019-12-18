@@ -24,86 +24,71 @@
 
 
 CREATE TABLE jobs ( 
-    job_id          NUMBER(10) NOT NULL PRIMARY KEY, 
+    job_id          NUMBER NOT NULL PRIMARY KEY, 
     job_title       VARCHAR2(35) NOT NULL, 
     min_salary      NUMBER(6), 
     max_salary      NUMBER(6)
 );
 
 CREATE TABLE employees ( 
-    employee_id     NUMBER(10) NOT NULL PRIMARY KEY, 
+    employee_id     NUMBER NOT NULL PRIMARY KEY, 
     first_name      VARCHAR2(20) NOT NULL, 
     last_name       VARCHAR2(25) NOT NULL,
     email           VARCHAR2(25) NOT NULL,
     phone_number    VARCHAR2(20) NOT NULL, 
     hire_date       DATE NOT NULL,
-    salary          NUMBER(8,2), 
-    job_id          VARCHAR2(10) NOT NULL,
-    supervisor_id   NUMBER(10), 
-    CONSTRAINT      emp_salary_min      CHECK (salary > 0), 
-    CONSTRAINT      emp_job_id_fk       FOREIGN KEY (job_id) REFERENCES jobs (job_id), 
-    CONSTRAINT      emp_supervisor_fk   FOREIGN KEY (supervisor_id) REFERENCES employees
+    salary          NUMBER(8), 
+    job_id          NUMBER NOT NULL,
+    supervisor_id   NUMBER, 
+    CONSTRAINT      e_s_min         CHECK (salary > 0), 
+    CONSTRAINT      e_j_fk          FOREIGN KEY (job_id) REFERENCES jobs (job_id), 
+    CONSTRAINT      e_s_fk          FOREIGN KEY (supervisor_id) REFERENCES employees
 );
 
 CREATE TABLE guests ( 
-    guest_id        NUMBER(10) NOT NULL PRIMARY KEY, 
-    first_name      VARCHAR2(20), 
-    last_name       VARCHAR2(25),
+    guest_id        NUMBER NOT NULL PRIMARY KEY, 
+    first_name      VARCHAR2(20) NOT NULL, 
+    last_name       VARCHAR2(25) NOT NULL,
     email           VARCHAR2(25),
     phone_number    VARCHAR2(20), 
-    CONSTRAINT      gue_gue_id_pk       PRIMARY KEY (employee_id), 
-    CONSTRAINT      gue_gue_id_uk       UNIQUE (employee_id),
-    CONSTRAINT      gue_first_name_nn   CHECK (first_name NOT NULL), 
-    CONSTRAINT      gue_last_name_nn    CHECK (last_name NOT NULL), 
-    CONSTRAINT      gue_phone_email_nn  CHECK (email NOT NULL OR phone_number NOT NULL)
+    CONSTRAINT      g_p_e_nn  CHECK (email IS NOT NULL OR phone_number IS NOT NULL)
 );
 
 
 CREATE TABLE beds ( 
-    bed_id          NUMBER(10) NOT NULL PRIMARY KEY,
-    bed_type        ENUM('for kids', 'sofa', 'normal', 'luxurious'),
-    capacity        NUMBER(1), 
-    CONSTRAINT      bed_bed_id_pk       PRIMARY KEY (bed_id),
-    CONSTRAINT      bed_bed_id_uk       UNIQUE (bed_id),
-	CONSTRAINT      bed_bed_type_nn     CHECK (bed_type NOT NULL),
-	CONSTRAINT      bed_capacity_nn     CHECK (capacity NOT NULL)
+    bed_id          NUMBER NOT NULL PRIMARY KEY,
+    bed_type        VARCHAR2(10) NOT NULL CHECK (bed_type IN ('for kids', 'sofa', 'normal', 'luxurious')),
+    capacity        NUMBER(1) NOT NULL
 );
 
 CREATE TABLE rooms ( 
-    room_id         NUMBER(10) NOT NULL PRIMARY KEY, 
-    capacity        NUMBER(2), 
-    has_bathroom    BOOLEAN,
-    smoking_allowed BOOLEAN,
-    pets_allowed    BOOLEAN,
-    maintainer_id   NUMBER(10), 
-    CONSTRAINT      room_room_id_pk     PRIMARY KEY (room_id),
-    CONSTRAINT      room_room_id_uk     UNIQUE (room_id),
-	CONSTRAINT      room_bed_id_nn      CHECK (bed_id NOT NULL),
-    CONSTRAINT      room_maintainer_fk  FOREIGN KEY (maintainer_id) REFERENCES employees
+    room_id         NUMBER NOT NULL PRIMARY KEY, 
+    capacity        NUMBER(2) NOT NULL, 
+    has_bathroom    NUMBER(1,0) DEFAULT 0,
+    smoking_allowed NUMBER(1,0) DEFAULT 0,
+    pets_allowed    NUMBER(1,0) DEFAULT 0,
+    maintainer_id   NUMBER,
+    CONSTRAINT      r_m_fk  FOREIGN KEY (maintainer_id) REFERENCES employees
 );
 
 CREATE TABLE bedsToRooms ( 
-    bed_id          NUMBER(10),
-    room_id         NUMBER(10),
-	CONSTRAINT      btr_bed_id_nn     CHECK (bed_id NOT NULL),
-    CONSTRAINT      btr_bed_id_fk  FOREIGN KEY (bed_id) REFERENCES beds,
-	CONSTRAINT      btr_room_id_nn    CHECK (room_id NOT NULL),
-    CONSTRAINT      btr_room_id_fk  FOREIGN KEY (room_id) REFERENCES rooms
+    bed_id          NUMBER,
+    room_id         NUMBER,
+    CONSTRAINT      b_b_i_fk  FOREIGN KEY (bed_id) REFERENCES beds,
+    CONSTRAINT      b_r_i_fk  FOREIGN KEY (room_id) REFERENCES rooms
 );
 
 CREATE TABLE reservations ( 
-    reservation_id  NUMBER(10) NOT NULL PRIMARY KEY,
-    check_in_date   DATE,
-    check_out_date  DATE,
-    room_costs      NUMBER(6),
+    reservation_id  NUMBER NOT NULL PRIMARY KEY,
+    check_in_date   DATE NOT NULL,
+    check_out_date  DATE NOT NULL,
+    room_costs      NUMBER(6) NOT NULL,
     extra_costs     NUMBER(6),
-    payment_status  VARCHAR2(10),
-    guest_id        NUMBER(10),
-    room_id         NUMBER(10),
-    CONSTRAINT      res_res_id_pk       PRIMARY KEY (reservation_id),
-    CONSTRAINT      res_res_id_uk       UNIQUE (reservation_id),
-    CONSTRAINT      res_guest_id_fk     FOREIGN KEY (guest_id) REFERENCES guests,
-    CONSTRAINT      res_room_id_fk      FOREIGN KEY (room_id) REFERENCES rooms
+    payment_status  VARCHAR2(10) NOT NULL CHECK (payment_status IN ('pending', 'paid', 'canceled')),
+    guest_id        NUMBER NOT NULL,
+    room_id         NUMBER NOT NULL,
+    CONSTRAINT      r_gt_i_fk     FOREIGN KEY (guest_id) REFERENCES guests,
+    CONSTRAINT      r_r_i_fk      FOREIGN KEY (room_id) REFERENCES rooms
 );
 
 TODO: 
