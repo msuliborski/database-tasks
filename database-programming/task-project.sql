@@ -275,6 +275,9 @@ end;
 
     at least 10 SQL queries for data preview should be defined; aggregate functions and SQL clauses should be considered,
         - ...
+    SELECT COUNT(*) AS NUM_OF_UNIQUE_GUESTS_RENTING_ROOMS FROM (SELECT DISTINCT guest_id FROM reservations); 
+    SELECT AVG(room_cost) FROM ROOMS;
+
     
     at least 2 functions that enable calculations should be defined
         - ...
