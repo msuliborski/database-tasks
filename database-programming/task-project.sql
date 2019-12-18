@@ -188,104 +188,123 @@ TODO:
         - add_employee(...)
         - ?...?
 
-
-
-create or replace procedure add_reservation (p_check_in_date date,
-                                             p_check_out_date date,
-                                             p_room_id number,
-                                             p_guest_id number) is 
-begin
-
-    if is_room_available(p_check_in_date, p_check_out_date, p_room_id) = 0 then
-        raise_application_error(-20002, 'Room is already booked in this time!');
-    end if;
-
-    insert into reservations values (reservations.nextval, p_check_in_date, p_check_out_date, 0, 'pending', p_room_id, p_guest_id);
-    
-end;
-
-create or replace procedure add_extra_costs (p_added_amount number,
-                                             p_reservation_id number) is 
-v_current_extra_costs number;
-v_payment_status reservations.payment_status%type;
-begin
-
-    select payment_status, extra_costs into v_payment_status from reservations where reservation_id = p_reservation_id;
-
-    if v_payment_status != 'pending' then
-        raise_application_error(-20002, 'Cannot add additional costs');
-    end if;
-
-    update reservations set extra_costs = v_current_extra_costs + p_added_amount
-    where reservation_id = p_reservation_id;
- 
-end;
-
-
-create or replace procedure add_employee (p_first_name employees.first_name%type,
-                                          p_last_name employees.last_name%type,
-                                          p_email employees.email%type,
-                                          p_phone_number employees.phone_number%type,
-                                          p_salary employees.salary%type,
-                                          p_job_id employees.job_id%type,
-                                          p_supervisor_id employees.supervisor_id%type) is 
-e_no_such_supervisor exception;
-e_no_such_job exception;
-v_row_count number;
-v_min_sal number;
-v_max_sal number;
-begin
-
-    if (p_supervisor_id is not null) then
-        select count(*) into v_row_count from employees where employee_id = p_supervisor_id;
-        if v_row_count = 0 then
-            raise e_no_such_supervisor;
+    create or replace procedure add_reservation (p_check_in_date date,
+                                                p_check_out_date date,
+                                                p_room_id number,
+                                                p_guest_id number) is 
+    begin
+        if is_room_available(p_check_in_date, p_check_out_date, p_room_id) = 0 then
+            raise_application_error(-20002, 'Room is already booked in this time!');
         end if;
-    end if;
+        insert into reservations values (reservations.nextval, p_check_in_date, p_check_out_date, 0, 'pending', p_room_id, p_guest_id);
+    end;
 
-    select count(*) into v_row_count from jobs where job_id = p_job_id;
-    if v_row_count = 0 then
-        raise e_no_such_job;
-    end if;
 
-    select min_salary, max_salary into v_min_sal, v_max_sal from jobs where job_id = p_job_id;
-    if p_salary > v_max_sal or p_salary < v_min_sal then
-        raise_application_error(-20001, 'Wrong salary value!');
-    end if;
+
+    create or replace procedure add_extra_costs (p_added_amount number,
+                                                p_reservation_id number) is 
+    v_current_extra_costs number;
+    v_payment_status reservations.payment_status%type;
+    begin
+
+        select payment_status, extra_costs into v_payment_status from reservations where reservation_id = p_reservation_id;
+
+        if v_payment_status != 'pending' then
+            raise_application_error(-20002, 'Cannot add additional costs');
+        end if;
+
+        update reservations set extra_costs = v_current_extra_costs + p_added_amount
+        where reservation_id = p_reservation_id;
     
-    INSERT INTO employees VALUES (employees_seq.nextval, p_first_name, p_last_name, p_email, p_phone_number, to_char(sysdate,'yyyy-mm-dd'), p_salary, p_job_id, p_supervisor_id);
+    end;
 
-    exception
-        when e_no_such_supervisor then 
-            dbms_output.put_line('No such supervisor!');
-        when e_no_such_job then 
-            dbms_output.put_line('No such job!');
 
-end;
+
+    create or replace procedure add_employee (p_first_name employees.first_name%type,
+                                            p_last_name employees.last_name%type,
+                                            p_email employees.email%type,
+                                            p_phone_number employees.phone_number%type,
+                                            p_salary employees.salary%type,
+                                            p_job_id employees.job_id%type,
+                                            p_supervisor_id employees.supervisor_id%type) is 
+    e_no_such_supervisor exception;
+    e_no_such_job exception;
+    v_row_count number;
+    v_min_sal number;
+    v_max_sal number;
+    begin
+        if (p_supervisor_id is not null) then
+            select count(*) into v_row_count from employees where employee_id = p_supervisor_id;
+            if v_row_count = 0 then
+                raise e_no_such_supervisor;
+            end if;
+        end if;
+
+        select count(*) into v_row_count from jobs where job_id = p_job_id;
+        if v_row_count = 0 then
+            raise e_no_such_job;
+        end if;
+
+        select min_salary, max_salary into v_min_sal, v_max_sal from jobs where job_id = p_job_id;
+        if p_salary > v_max_sal or p_salary < v_min_sal then
+            raise_application_error(-20001, 'Wrong salary value!');
+        end if;
+        
+        INSERT INTO employees VALUES (employees_seq.nextval, p_first_name, p_last_name, p_email, p_phone_number, to_char(sysdate,'yyyy-mm-dd'), p_salary, p_job_id, p_supervisor_id);
+
+        exception
+            when e_no_such_supervisor then 
+                dbms_output.put_line('No such supervisor!');
+            when e_no_such_job then 
+                dbms_output.put_line('No such job!');
+    end;
+
+
 
     at least 10 SQL queries for data preview should be defined; aggregate functions and SQL clauses should be considered,
         - ...
-    
+
+    -- count of unique guests renting rooms
+    SELECT COUNT(*) AS NUM_OF_UNIQUE_GUESTS_RENTING_ROOMS FROM (SELECT DISTINCT guest_id FROM reservations); 
+    -- avg rent cost of room
+    SELECT AVG(costs_per_day) FROM ROOMS; 
+    -- reservations starting  in current year
+    SELECT * FROM reservations WHERE TO_CHAR(check_in_date, 'YYYY') = TO_CHAR(sysdate, 'YYYY'); 
+    --unique jobs performed by employees
+    SELECT DISTINCT job_title AS UNIQUE_JOBS_PERFORMED_BY_EMPLOYEES FROM jobs j JOIN employees e ON j.job_id = e.job_id;
+    -- get number of employees under supervisors
+    SELECT supervisor_id, COUNT(employee_id) FROM employees WHERE supervisor_id IS NOT NULL GROUP BY supervisor_id;
+    -- get employee with biggest salary
+    SELECT first_name, last_name, salary FROM employees WHERE salary = (SELECT MAX(salary) FROM employees);
+    -- get avg salaries by job
+    SELECT job_title, AVG(salary) FROM JOBS j JOIN EMPLOYEES e ON j.job_id = e.job_id GROUP BY job_title;   
+    -- get sum of employees' salaries apart from owner
+    SELECT SUM(salary) AS SUM_OF_EMPLOYEES_SALARIES FROM JOBS j JOIN EMPLOYEES e ON j.job_id = e.job_id WHERE job_title <> 'Owner';
+    -- get real max salary by job when it's bigger then 2000
+    SELECT job_title, MAX(salary) FROM JOBS j JOIN EMPLOYEES e ON j.job_id = e.job_id GROUP BY job_title HAVING MAX(salary) > 2000;   
+    -- get real min salary and hypothetical min salary by job
+    SELECT job_title, MIN(salary), min_salary FROM JOBS j JOIN EMPLOYEES e ON j.job_id = e.job_id GROUP BY job_title;   
+
+
+
     at least 2 functions that enable calculations should be defined
         - ...
 
+    create or replace function is_room_available (p_room_id number,
+                                                        p_check_in_date date,
+                                                        p_check_out_date date) 
+    return number is
+    v_check_in_date date;
+    v_check_out_date date;
+    begin
+        select check_in_date, check_out_date into v_check_out_date from reservations where room_id = p_room_id;
+        if sql%rowcount = 0 then
+            return 1;
+        end if;
 
+        if trunc(sysdate) between v_check_in_date and v_check_out_date then
+            return 0;
+        end if;
 
-create or replace function is_room_available (p_room_id number,
-                                                    p_check_in_date date,
-                                                    p_check_out_date date) 
-return number is
-v_check_in_date date;
-v_check_out_date date;
-begin
-    select check_in_date, check_out_date into v_check_out_date from reservations where room_id = p_room_id;
-    if sql%rowcount = 0 then
         return 1;
-    end if;
-
-    if trunc(sysdate) between v_check_in_date and v_check_out_date then
-        return 0;
-    end if;
-
-    return 1;
-end;
+    end;
