@@ -263,7 +263,7 @@ TODO:
 
 
 
-    create or replace procedure add_employee (p_first_name employees.first_name%type,
+create or replace procedure add_employee (p_first_name employees.first_name%type,
                                             p_last_name employees.last_name%type,
                                             p_email employees.email%type,
                                             p_phone_number employees.phone_number%type,
@@ -294,7 +294,7 @@ TODO:
         end if;
         
         INSERT INTO employees VALUES (
-            employees_seq.nextval, p_first_name, p_last_name, p_email, p_phone_number, to_char(sysdate,'yyyy-mm-dd'), p_salary, p_job_id, p_supervisor_id);
+            employees_seq.nextval, p_first_name, p_last_name, p_email, p_phone_number, sysdate, p_salary, p_job_id, p_supervisor_id);
 
         exception
             when e_no_such_supervisor then 
@@ -344,6 +344,7 @@ TODO:
         where room_id = p_room_id;
     v_room_record c_room_cursor%rowtype;
     begin
+        v_is_available := 1;
         open c_room_cursor;
             loop
                 fetch c_room_cursor into v_room_record;
@@ -355,7 +356,7 @@ TODO:
                 end if;
             end loop;
         close c_room_cursor;
-        return 0;
+        return v_is_available;
     end;
 
    CREATE OR REPLACE FUNCTION GET_RESERVATION_COST(p_reservation_row reservations%rowtype)
