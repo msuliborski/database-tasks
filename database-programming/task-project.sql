@@ -95,8 +95,45 @@ TODO:
     at least 3 procedures performing different operations should be defined (e.g. for adding, modification, and retrieving data from the database)
         - checkIfRoomAvailable(check_in_date DATE, check_out_date DATE)
         - addReservation(...)
-        - addEmployee(...)
+        - add_employee(...)
         - ?...?
+
+
+
+CREATE OR REPLACE PROCEDURE ADD_EMPLOYEE(p_first_name EMPLOYEES.first_name%type,
+                                         p_last_name EMPLOYEES.last_name%type,
+                                         p_email EMPLOYEES.email%type,
+                                         p_phone_number EMPLOYEES.phone_number%type,
+                                         p_hire_date EMPLOYEES.hire_date%type,
+                                         p_salary EMPLOYEES.salary%type,
+                                         p_job_id EMPLOYEES.job_id%type,
+                                         p_supervisor_id EMPLOYEES.supervisor_id%type) IS 
+no_such_supervisor EXCEPTION;
+no_such_job EXCEPTION;
+salary_should_be_bigger_than_zero EXCEPTION;
+row_count NUMBER;
+BEGIN
+    IF (p_supervisor_id IS NOT NULL) THEN
+        SELECT COUNT(*) INTO row_count FROM EMPLOYEES where employee_id = p_supervisor_id;
+        IF row_count = 0 THEN
+            RAISE no_such_supervisor;
+        END IF;
+    END IF;
+
+    SELECT COUNT(*) INTO row_count FROM JOBS where job_id = p_job_id;
+    IF row_count = 0 THEN
+        RAISE no_such_job;
+    END IF;
+
+    IF p_salary <= 0 THEN
+        RAISE salary_should_be_bigger_than_zero;
+    END IF;
+
+    EXCEPTION
+        WHEN no_such_supervisor then dbms_output.PUT_LINE("SHIEEgET!");
+        WHEN no_such_job then dbms_output.PUT_LINE("SHIEEggET!");
+        WHEN salary_should_be_bigger_than_zero then dbms_output.PUT_LINE("SHIEEET!");
+END;
 
     at least 10 SQL queries for data preview should be defined; aggregate functions and SQL clauses should be considered,
         - ...
