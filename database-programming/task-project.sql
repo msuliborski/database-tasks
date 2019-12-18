@@ -349,7 +349,9 @@ create or replace procedure add_employee (p_first_name employees.first_name%type
                 fetch c_room_cursor into v_room_record;
                 exit when c_room_cursor%notfound;
                 if v_room_record.check_in_date between p_check_in_date and p_check_out_date or
-                   v_room_record.check_out_date between p_check_in_date and p_check_out_date then
+                   v_room_record.check_out_date between p_check_in_date and p_check_out_date or 
+                   p_check_in_date between v_room_record.check_in_date and v_room_record.check_out_date or
+                   p_check_out_date between v_room_record.check_in_date and v_room_record.check_out_date then
                     v_is_available := 0;
                     exit;
                 end if;
@@ -358,6 +360,7 @@ create or replace procedure add_employee (p_first_name employees.first_name%type
         return v_is_available;
     end;
 
+    
    CREATE OR REPLACE FUNCTION GET_RESERVATION_COST(p_reservation_row reservations%rowtype)
     RETURN ROOMS.costs_per_day%type
     IS
