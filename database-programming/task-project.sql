@@ -29,6 +29,11 @@ CREATE TABLE jobs (
     min_salary      NUMBER(6),
     max_salary      NUMBER(6)
 );
+CREATE SEQUENCE jobs_seq
+    START WITH     1
+    INCREMENT BY   1
+    NOCACHE
+    NOCYCLE;
 
 INSERT INTO jobs VALUES (1, 'Owner', null, null);
 INSERT INTO jobs VALUES (2, 'Flat surfaces maintainer', 2000, 3000);
@@ -51,6 +56,11 @@ CREATE TABLE employees (
     CONSTRAINT      e_j_fk          FOREIGN KEY (job_id) REFERENCES jobs (job_id), 
     CONSTRAINT      e_s_fk          FOREIGN KEY (supervisor_id) REFERENCES employees
 );
+CREATE SEQUENCE employees_seq
+    START WITH     1
+    INCREMENT BY   1
+    NOCACHE
+    NOCYCLE;
 
 INSERT INTO employees VALUES (1, 'Jan', 'Kowalski', 'sking@hotel.com', '+48 123 456 789', TO_DATE('2015-12-01', 'yyyy-mm-dd'), 8900, 1, null);
 
@@ -74,6 +84,11 @@ CREATE TABLE guests (
     phone_number    VARCHAR2(20), 
     CONSTRAINT      g_p_e_nn  CHECK (email IS NOT NULL OR phone_number IS NOT NULL)
 );
+CREATE SEQUENCE guests_seq
+    START WITH     1
+    INCREMENT BY   1
+    NOCACHE
+    NOCYCLE;
 
 INSERT INTO guests VALUES (1, 'John', 'Chen', 'bbbbdf@hotel.com', '+48 123 456 789');
 INSERT INTO guests VALUES (2, 'Ismael', 'Sciarra', 'reberb@hotel.com', '+48 123 456 789');
@@ -88,6 +103,11 @@ CREATE TABLE beds (
     bed_type        VARCHAR2(10) NOT NULL CHECK (bed_type IN ('for kids', 'sofa', 'normal', 'luxurious')),
     capacity        NUMBER(1) NOT NULL
 );
+CREATE SEQUENCE beds_seq
+    START WITH     1
+    INCREMENT BY   1
+    NOCACHE
+    NOCYCLE;
 
 INSERT INTO beds VALUES (1, 'for kids', 1);
 INSERT INTO beds VALUES (2, 'sofa', 1);
@@ -109,6 +129,11 @@ CREATE TABLE rooms (
     maintainer_id   NUMBER,
     CONSTRAINT      r_m_fk  FOREIGN KEY (maintainer_id) REFERENCES employees
 );
+CREATE SEQUENCE rooms_seq
+    START WITH     1
+    INCREMENT BY   1
+    NOCACHE
+    NOCYCLE;
 
 INSERT INTO rooms VALUES (1, 3, 0, 1, 1, 50, 2);
 INSERT INTO rooms VALUES (2, 5, 1, 1, 1, 100, 2);
@@ -160,9 +185,14 @@ CREATE TABLE reservations (
     payment_status  VARCHAR2(10) NOT NULL CHECK (payment_status IN ('pending', 'paid', 'canceled')),
     room_id         NUMBER NOT NULL,
     guest_id        NUMBER NOT NULL,
-    CONSTRAINT      r_gt_i_fk     FOREIGN KEY (guest_id) REFERENCES guests,
-    CONSTRAINT      r_r_i_fk      FOREIGN KEY (room_id) REFERENCES rooms
+    CONSTRAINT      r_r_i_fk      FOREIGN KEY (room_id) REFERENCES rooms,
+    CONSTRAINT      r_g_i_fk     FOREIGN KEY (guest_id) REFERENCES guests
 );
+CREATE SEQUENCE reservations_seq
+    START WITH     1
+    INCREMENT BY   1
+    NOCACHE
+    NOCYCLE;
 
 INSERT INTO reservations VALUES (1, TO_DATE('2019-12-01', 'yyyy-mm-dd'), TO_DATE('2019-12-08', 'yyyy-mm-dd'), 50, 'paid', 7, 1);
 INSERT INTO reservations VALUES (2, TO_DATE('2019-12-14', 'yyyy-mm-dd'), TO_DATE('2020-01-02', 'yyyy-mm-dd'), 300, 'pending', 9, 1);
@@ -188,15 +218,28 @@ TODO:
         - add_employee(...)
         - ?...?
 
+
+    create or replace procedure add_guest (p_first_name guests.first_name%type,
+                                           p_last_name guests.last_name%type,
+                                           p_email guests.email%type,
+                                           p_phone_number guests.phone_number%type) is 
+    begin
+        insert into guests values (
+            guests_seq.nextval, p_first_name, p_last_name, p_email, p_phone_number);
+    end;
+
+
+
     create or replace procedure add_reservation (p_check_in_date date,
                                                 p_check_out_date date,
                                                 p_room_id number,
                                                 p_guest_id number) is 
     begin
-        if is_room_available(p_check_in_date, p_check_out_date, p_room_id) = 0 then
+        if is_room_available(p_room_id, p_check_in_date, p_check_out_date) = 0 then
             raise_application_error(-20002, 'Room is already booked in this time!');
         end if;
-        insert into reservations values (reservations.nextval, p_check_in_date, p_check_out_date, 0, 'pending', p_room_id, p_guest_id);
+        insert into reservations values (
+            reservations_seq.nextval, p_check_in_date, p_check_out_date, 0, 'pending', p_room_id, p_guest_id);
     end;
 
 
@@ -207,7 +250,7 @@ TODO:
     v_payment_status reservations.payment_status%type;
     begin
 
-        select payment_status, extra_costs into v_payment_status from reservations where reservation_id = p_reservation_id;
+        select payment_status, extra_costs into v_payment_status, v_current_extra_costs from reservations where reservation_id = p_reservation_id;
 
         if v_payment_status != 'pending' then
             raise_application_error(-20002, 'Cannot add additional costs');
@@ -250,7 +293,8 @@ TODO:
             raise_application_error(-20001, 'Wrong salary value!');
         end if;
         
-        INSERT INTO employees VALUES (employees_seq.nextval, p_first_name, p_last_name, p_email, p_phone_number, to_char(sysdate,'yyyy-mm-dd'), p_salary, p_job_id, p_supervisor_id);
+        INSERT INTO employees VALUES (
+            employees_seq.nextval, p_first_name, p_last_name, p_email, p_phone_number, to_char(sysdate,'yyyy-mm-dd'), p_salary, p_job_id, p_supervisor_id);
 
         exception
             when e_no_such_supervisor then 
@@ -294,17 +338,22 @@ TODO:
                                                         p_check_in_date date,
                                                         p_check_out_date date) 
     return number is
-    v_check_in_date date;
-    v_check_out_date date;
+    v_is_available number;
+    cursor c_room_cursor is
+        select check_in_date, check_out_date from reservations
+        where room_id = p_room_id;
+    v_room_record c_room_cursor%rowtype;
     begin
-        select check_in_date, check_out_date into v_check_out_date from reservations where room_id = p_room_id;
-        if sql%rowcount = 0 then
-            return 1;
-        end if;
-
-        if trunc(sysdate) between v_check_in_date and v_check_out_date then
-            return 0;
-        end if;
-
-        return 1;
+        open c_room_cursor;
+            loop
+                fetch c_room_cursor into v_room_record;
+                exit when c_room_cursor%notfound;
+                if v_room_record.check_in_date between p_check_in_date and p_check_out_date or
+                   v_room_record.check_out_date between p_check_in_date and p_check_out_date then
+                    v_is_available := 0;
+                    exit;
+                end if;
+            end loop;
+        close c_room_cursor;
+        return 0;
     end;
