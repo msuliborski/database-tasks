@@ -330,16 +330,5 @@ TODO:
         CLOSE c_res_cursor;
         RETURN v_revenues;
     END;
-
-    CREATE TABLE reservations ( 
-    reservation_id  NUMBER NOT NULL PRIMARY KEY,
-    check_in_date   DATE NOT NULL,
-    check_out_date  DATE NOT NULL,
-    extra_costs     NUMBER(6),
-    payment_status  VARCHAR2(10) NOT NULL CHECK (payment_status IN ('pending', 'paid', 'canceled')),
-    room_id         NUMBER NOT NULL,
-    guest_id        NUMBER NOT NULL,
-    CONSTRAINT      r_gt_i_fk     FOREIGN KEY (guest_id) REFERENCES guests,
-    CONSTRAINT      r_r_i_fk      FOREIGN KEY (room_id) REFERENCES rooms
-);
+ 
 
