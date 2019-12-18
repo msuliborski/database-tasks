@@ -189,57 +189,43 @@ TODO:
         - ?...?
 
 
-reservation_id  NUMBER NOT NULL PRIMARY KEY,
-    check_in_date   DATE NOT NULL,
-    check_out_date  DATE NOT NULL,
-    extra_costs     NUMBER(6),
-    payment_status  VARCHAR2(10) NOT NULL CHECK (payment_status IN ('pending', 'paid', 'canceled')),
-    room_id         NUMBER NOT NULL,
-    guest_id        NUMBER NOT NULL,
+
 create or replace procedure add_reservation (p_check_in_date date,
                                              p_check_out_date date,
-                                             p_extra_costs reservations.extra_costs%type,
-                                             p_payment_status reservations.payment_status%type,
                                              p_room_id number,
                                              p_guest_id number) is 
-e_no_such_supervisor exception;
-e_no_such_job exception;
-v_row_count number;
-v_min_sal number;
-v_max_sal number;
 begin
-    if (p_supervisor_id is not null) then
-        select count(*) into v_row_count from employees where employee_id = p_supervisor_id;
-        if v_row_count = 0 then
-            raise e_no_such_supervisor;
-        end if;
+
+    if is_room_available(p_check_in_date, p_check_out_date, p_room_id) = 0 then
+        raise_application_error(-20002, 'Room is already booked in this time!');
     end if;
 
-    select count(*) into v_row_count from jobs where job_id = p_job_id;
-    if v_row_count = 0 then
-        raise e_no_such_job;
-    end if;
-
-    select min_salary, max_salary into v_min_sal, v_max_sal from jobs where job_id = p_job_id;
-    if p_salary > v_max_sal or p_salary < v_min_sal then
-        raise_application_error(-20001, 'Wrong salary value!');
-    end if;
-
-    exception
-        when e_no_such_supervisor then 
-            dbms_output.put_line('No such supervisor!');
-        when e_no_such_job then 
-            dbms_output.put_line('No such job!');
+    insert into reservations values (reservations.nextval, p_check_in_date, p_check_out_date, 0, 'pending', p_room_id, p_guest_id);
+    
 end;
 
+create or replace procedure add_extra_costs (p_added_amount number,
+                                             p_reservation_id number) is 
+v_current_extra_costs number;
+v_payment_status reservations.payment_status%type;
+begin
 
+    select payment_status, extra_costs into v_payment_status from reservations where reservation_id = p_reservation_id;
+
+    if v_payment_status != 'pending' then
+        raise_application_error(-20002, 'Cannot add additional costs');
+    end if;
+
+    update reservations set extra_costs = v_current_extra_costs + p_added_amount
+    where reservation_id = p_reservation_id;
+ 
+end;
 
 
 create or replace procedure add_employee (p_first_name employees.first_name%type,
                                           p_last_name employees.last_name%type,
                                           p_email employees.email%type,
                                           p_phone_number employees.phone_number%type,
-                                          p_hire_date employees.hire_date%type,
                                           p_salary employees.salary%type,
                                           p_job_id employees.job_id%type,
                                           p_supervisor_id employees.supervisor_id%type) is 
@@ -249,6 +235,7 @@ v_row_count number;
 v_min_sal number;
 v_max_sal number;
 begin
+
     if (p_supervisor_id is not null) then
         select count(*) into v_row_count from employees where employee_id = p_supervisor_id;
         if v_row_count = 0 then
@@ -265,19 +252,19 @@ begin
     if p_salary > v_max_sal or p_salary < v_min_sal then
         raise_application_error(-20001, 'Wrong salary value!');
     end if;
+    
+    INSERT INTO employees VALUES (employees_seq.nextval, p_first_name, p_last_name, p_email, p_phone_number, to_char(sysdate,'yyyy-mm-dd'), p_salary, p_job_id, p_supervisor_id);
 
     exception
         when e_no_such_supervisor then 
             dbms_output.put_line('No such supervisor!');
         when e_no_such_job then 
             dbms_output.put_line('No such job!');
+
 end;
 
     at least 10 SQL queries for data preview should be defined; aggregate functions and SQL clauses should be considered,
         - ...
-    SELECT COUNT(*) AS NUM_OF_UNIQUE_GUESTS_RENTING_ROOMS FROM (SELECT DISTINCT guest_id FROM reservations); 
-    SELECT AVG(room_cost) FROM ROOMS;
-
     
     at least 2 functions that enable calculations should be defined
         - ...
