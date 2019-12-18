@@ -226,10 +226,27 @@ BEGIN
 END;
 
     at least 10 SQL queries for data preview should be defined; aggregate functions and SQL clauses should be considered,
-        - ...
+    -- count of unique guests renting rooms
     SELECT COUNT(*) AS NUM_OF_UNIQUE_GUESTS_RENTING_ROOMS FROM (SELECT DISTINCT guest_id FROM reservations); 
-    SELECT AVG(room_cost) FROM ROOMS;
+    -- avg rent cost of room
+    SELECT AVG(costs_per_day) FROM ROOMS; 
+    -- reservations starting  in current year
+    SELECT * FROM reservations WHERE TO_CHAR(check_in_date, 'YYYY') = TO_CHAR(sysdate, 'YYYY'); 
+    --unique jobs performed by employees
+    SELECT DISTINCT job_title AS UNIQUE_JOBS_PERFORMED_BY_EMPLOYEES FROM jobs j JOIN employees e ON j.job_id = e.job_id;
+    -- get number of employees under supervisors
+    SELECT supervisor_id, COUNT(employee_id) FROM employees WHERE supervisor_id IS NOT NULL GROUP BY supervisor_id;
+    -- get employee with biggest salary
+    SELECT first_name, last_name, salary FROM employees WHERE salary = (SELECT MAX(salary) FROM employees);
+    -- get avg salaries by job
+    SELECT job_title, AVG(salary) FROM JOBS j JOIN EMPLOYEES e ON j.job_id = e.job_id GROUP BY job_title;   
+    -- get sum of employees' salaries apart from owner
+    SELECT SUM(salary) AS SUM_OF_EMPLOYEES_SALARIES FROM JOBS j JOIN EMPLOYEES e ON j.job_id = e.job_id WHERE job_title <> 'Owner';
+    -- get real max salary by job when it's bigger then 2000
+    SELECT job_title, MAX(salary) FROM JOBS j JOIN EMPLOYEES e ON j.job_id = e.job_id GROUP BY job_title HAVING MAX(salary) > 2000;   
+    -- get real min salary and hypothetical min salary by job
+    SELECT job_title, MIN(salary), min_salary FROM JOBS j JOIN EMPLOYEES e ON j.job_id = e.job_id GROUP BY job_title;   
 
-    
     at least 2 functions that enable calculations should be defined
         - ...
+
