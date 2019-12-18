@@ -31,9 +31,9 @@ CREATE TABLE jobs (
 );
 
 INSERT INTO jobs VALUES (1, 'Owner', null, null);
-INSERT INTO jobs VALUES (2, 'Flat surfaces maintainer', null, null);
-INSERT INTO jobs VALUES (3, 'Doorkeeper ', null, null);
-INSERT INTO jobs VALUES (4, 'Junior assistant', null, null);   
+INSERT INTO jobs VALUES (2, 'Flat surfaces maintainer', 2000, 3000);
+INSERT INTO jobs VALUES (3, 'Doorkeeper ', 2000, 5000);
+INSERT INTO jobs VALUES (4, 'Junior assistant', 1000, 2000);   
 
 
 
@@ -189,44 +189,113 @@ TODO:
         - ?...?
 
 
+reservation_id  NUMBER NOT NULL PRIMARY KEY,
+    check_in_date   DATE NOT NULL,
+    check_out_date  DATE NOT NULL,
+    extra_costs     NUMBER(6),
+    payment_status  VARCHAR2(10) NOT NULL CHECK (payment_status IN ('pending', 'paid', 'canceled')),
+    room_id         NUMBER NOT NULL,
+    guest_id        NUMBER NOT NULL,
+create or replace procedure add_reservation (p_check_in_date date,
+                                             p_check_out_date date,
+                                             p_extra_costs reservations.extra_costs%type,
+                                             p_payment_status reservations.payment_status%type,
+                                             p_room_id number,
+                                             p_guest_id number) is 
+e_no_such_supervisor exception;
+e_no_such_job exception;
+v_row_count number;
+v_min_sal number;
+v_max_sal number;
+begin
+    if (p_supervisor_id is not null) then
+        select count(*) into v_row_count from employees where employee_id = p_supervisor_id;
+        if v_row_count = 0 then
+            raise e_no_such_supervisor;
+        end if;
+    end if;
 
-CREATE OR REPLACE PROCEDURE ADD_EMPLOYEE(p_first_name EMPLOYEES.first_name%type,
-                                         p_last_name EMPLOYEES.last_name%type,
-                                         p_email EMPLOYEES.email%type,
-                                         p_phone_number EMPLOYEES.phone_number%type,
-                                         p_hire_date EMPLOYEES.hire_date%type,
-                                         p_salary EMPLOYEES.salary%type,
-                                         p_job_id EMPLOYEES.job_id%type,
-                                         p_supervisor_id EMPLOYEES.supervisor_id%type) IS 
-no_such_supervisor EXCEPTION;
-no_such_job EXCEPTION;
-salary_should_be_bigger_than_zero EXCEPTION;
-row_count NUMBER;
-BEGIN
-    IF (p_supervisor_id IS NOT NULL) THEN
-        SELECT COUNT(*) INTO row_count FROM EMPLOYEES where employee_id = p_supervisor_id;
-        IF row_count = 0 THEN
-            RAISE no_such_supervisor;
-        END IF;
-    END IF;
+    select count(*) into v_row_count from jobs where job_id = p_job_id;
+    if v_row_count = 0 then
+        raise e_no_such_job;
+    end if;
 
-    SELECT COUNT(*) INTO row_count FROM JOBS where job_id = p_job_id;
-    IF row_count = 0 THEN
-        RAISE no_such_job;
-    END IF;
+    select min_salary, max_salary into v_min_sal, v_max_sal from jobs where job_id = p_job_id;
+    if p_salary > v_max_sal or p_salary < v_min_sal then
+        raise_application_error(-20001, 'Wrong salary value!');
+    end if;
 
-    IF p_salary <= 0 THEN
-        RAISE salary_should_be_bigger_than_zero;
-    END IF;
+    exception
+        when e_no_such_supervisor then 
+            dbms_output.put_line('No such supervisor!');
+        when e_no_such_job then 
+            dbms_output.put_line('No such job!');
+end;
 
-    EXCEPTION
-        WHEN no_such_supervisor then dbms_output.PUT_LINE("SHIEEgET!");
-        WHEN no_such_job then dbms_output.PUT_LINE("SHIEEggET!");
-        WHEN salary_should_be_bigger_than_zero then dbms_output.PUT_LINE("SHIEEET!");
-END;
+
+
+
+create or replace procedure add_employee (p_first_name employees.first_name%type,
+                                          p_last_name employees.last_name%type,
+                                          p_email employees.email%type,
+                                          p_phone_number employees.phone_number%type,
+                                          p_hire_date employees.hire_date%type,
+                                          p_salary employees.salary%type,
+                                          p_job_id employees.job_id%type,
+                                          p_supervisor_id employees.supervisor_id%type) is 
+e_no_such_supervisor exception;
+e_no_such_job exception;
+v_row_count number;
+v_min_sal number;
+v_max_sal number;
+begin
+    if (p_supervisor_id is not null) then
+        select count(*) into v_row_count from employees where employee_id = p_supervisor_id;
+        if v_row_count = 0 then
+            raise e_no_such_supervisor;
+        end if;
+    end if;
+
+    select count(*) into v_row_count from jobs where job_id = p_job_id;
+    if v_row_count = 0 then
+        raise e_no_such_job;
+    end if;
+
+    select min_salary, max_salary into v_min_sal, v_max_sal from jobs where job_id = p_job_id;
+    if p_salary > v_max_sal or p_salary < v_min_sal then
+        raise_application_error(-20001, 'Wrong salary value!');
+    end if;
+
+    exception
+        when e_no_such_supervisor then 
+            dbms_output.put_line('No such supervisor!');
+        when e_no_such_job then 
+            dbms_output.put_line('No such job!');
+end;
 
     at least 10 SQL queries for data preview should be defined; aggregate functions and SQL clauses should be considered,
         - ...
     
     at least 2 functions that enable calculations should be defined
         - ...
+
+
+
+create or replace function is_room_available (p_room_id number,
+                                                    p_check_in_date date,
+                                                    p_check_out_date date) 
+return number is
+v_check_in_date date;
+v_check_out_date date;
+begin
+    select check_in_date, check_out_date into v_check_out_date from reservations where room_id = p_room_id;
+    if sql%rowcount = 0 then
+        return 1;
+    end if;
+
+    if trunc(sysdate) between v_check_in_date and v_check_out_date then
+        return 0;
+    end if;
+
+    return 1;
+end;
