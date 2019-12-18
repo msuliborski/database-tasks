@@ -357,3 +357,27 @@ TODO:
         close c_room_cursor;
         return 0;
     end;
+
+    CREATE OR REPLACE FUNCTION GET_ANN_REVENUES(p_year VARCHAR2)
+    RETURN ROOMS.costs_per_day%type
+    IS
+    v_revenues NUMBER := 0;
+    v_costs_per_day NUMBER;
+    CURSOR c_res_cursor IS SELECT * FROM reservations;
+    r_res reservations%rowtype;
+    BEGIN
+        OPEN c_res_cursor();
+        loop
+          FETCH c_res_cursor INTO r_res;
+          EXIT when c_res_cursor%NOTFOUND;
+          IF (r_res.payment_status = 'paid' AND p_year = TO_CHAR(r_res.check_out_date, 'YYYY')) THEN
+            SELECT costs_per_day INTO v_costs_per_day FROM ROOMS r WHERE r.room_id = r_res.room_id;
+            v_costs_per_day := v_costs_per_day * (r_res.check_out_date - r_res.check_in_date);
+            v_revenues := v_revenues + v_costs_per_day;
+          END IF;
+        end loop; 
+        CLOSE c_res_cursor;
+        RETURN v_revenues;
+    END;
+ 
+
