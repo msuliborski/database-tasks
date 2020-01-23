@@ -36,6 +36,7 @@ exception
     dbms_output.put_line('No employees found'); 
 end;
 
+select * from employees where employee_id = 100;
 exec salary_raise('King');
 exec salary_raise('Wrong last name');
 
@@ -63,8 +64,9 @@ exception
     return 0;
 end;
 
-select dep_sum('executive') from dual; 
-select dep_sum('wrong department name') from dual; 
+select * from employees where department_id = 90;
+select dep_sum('Executive') from dual; 
+select dep_sum('Wrong department name') from dual; 
 
 
 

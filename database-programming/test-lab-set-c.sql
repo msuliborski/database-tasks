@@ -3,174 +3,79 @@
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 
 -- 1
--- Utwórz blok anonimowy, w którym za pomocą kursora z parametrem w postaci numeru działu
--- > wypisane zostaną nazwiska wszystkich pracowników z podanego działu
--- > na koniec zostanie wypisany komunikat "Dział .. zatrudnia .. pracowników" lub "Podany dział nie zatrudnia pracowników"
+-- Utwórz blok anonimowy, w którym za pomocą kursora z parametrem w postaci numeru działu wypisane zostaną nazwiska wszystkich pracowników z podanego działu, a na koniec zostanie wypisany komunikat "Dział .. zatrudnia .. pracowników" lub "Podany dział nie zatrudnia pracowników"
+declare
+  cursor c_emps_in_dep(p_dep_id departments.department_id%type) is
+    select last_name from employees where department_id = p_dep_id;
+  emp_count number(4) := 0;
+  p_param departments.department_id%type := 90;
+begin
+  for emp in c_emps_in_dep(p_param) loop
+    dbms_output.put_line(emp.last_name);
+    emp_count := emp_count + 1;
+  end loop;
+  dbms_output.put_line('Department ' || p_param || ' employes ' || emp_count || ' employees');
+end;
+
+
 
 -- 2
--- Napisz procedurę, która:
--- > w dziale o numerze podanym jako parametr, zwiększy wszystkim jego pracownikom pensję o 10%
--- > na koniec wypisany zostanie komunikat, że pracownikom została zmieniona pensja.
--- > Dodaj obsługę błędów dla przypadku, gdy numer działu nie zostanie odnaleziony.
--- > Napisz blok z wywołaniem tej procedury
+-- Napisz procedurę, która: w dziale o numerze podanym jako parametr, zwiększy wszystkim jego pracownikom pensję o 10%, a na koniec wypisany zostanie komunikat, że pracownikom została zmieniona pensja. Dodaj obsługę błędów dla przypadku, gdy numer działu nie zostanie odnaleziony. Napisz blok z wywołaniem tej procedury
+create or replace procedure salary_raise(p_dep_name departments.department_name%type) is
+  e_no_dep_found exception;
+  deps_count number(4) := 0;
+  emps_count number(4) := 0;
+  deps_changed number(4) := 0;
+  cursor c_emps is select * from employees e join departments d on e.department_id = d.department_id where department_name = p_dep_name;
+begin
+  select count(*) into deps_count from departments where department_name = p_dep_name;
+  if deps_count = 0 then
+    raise e_no_dep_found;
+  else 
+    for emp in c_emps loop
+      update employees 
+      set salary = salary * 1.1
+      where employee_id = emp.employee_id;
+      emps_count := emps_count + 1;
+    end loop;
+    dbms_output.put_line('Salary has been changed'); 
+  end if;
+exception
+  when e_no_dep_found then
+    dbms_output.put_line('No department found'); 
+end;
+
+select * from employees where department_id = 90;
+exec salary_raise('Executive');
+exec salary_raise('Wrong department name');
+
+
 
 -- 3
 -- Napisz funkcję, która dla podanego działu obliczy różnicę pomiędzy maksymalnym i minimalnym wynagrodzeniem w tym dziale. Funkcję wywołaj w zapytaniu dającym wynik w postaci dwóch kolum: id_działu, różnica
+create or replace function dep_sal_diff(p_dep_id departments.department_id%type) 
+return employees.salary%type is
+  dep_sal_diff employees.salary%type := 0;
+begin
+  select max(salary) - min(salary) into dep_sal_diff from employees where department_id = p_dep_id;
+  return dep_sal_diff;
+end;
+
+select salary from employees e join departments d on e.department_id = d.department_id where e.department_id = 90;
+select * from departments where department_id = 90; 
+
+
 
 -- 4
 -- Utwórz wyzwalacz, który przy wstawaniu nowego rekordu dla tabeli countries, jeśli użytkownik nie poda nazwy państwa (country_name), będzie wpisywał pod nazwę państwa wartość 'Nowa nazwa'
-
-
-
-
-
-
-
--- ANSWERS
--- by Michal
--- 1
-declare
-CURSOR c_emp(a_dep_id employees.department_id%type)
-IS SELECT last_name from employees where department_id = a_dep_id;
-v_l_name employees.last_name%type;
-v_dep_name employees.department_id%type := 100;
-begin 
-    OPEN c_emp(v_dep_name);
-    loop
-      FETCH c_emp INTO v_l_name;
-      IF c_emp%NOTFOUND THEN
-        IF c_emp%ROWCOUNT = 0 THEN
-        dbms_output.put_line('Shieet');
-        ELSE 
-        dbms_output.put_line(c_emp%ROWCOUNT);
-        END IF;
-       EXIT;
-      END IF;
-      dbms_output.put_line(v_l_name ||' ' || v_dep_name );
-    end loop;
-    close c_emp;
-
-
-end;
-
-
--- 2
-CREATE OR REPLACE PROCEDURE a(p_dep_id employees.department_id%type)
-IS
-v_dep_id employees.department_id%type;
-BEGIN
-    SELECT department_id INTO v_dep_id FROM departments where department_id = p_dep_id;
-    UPDATE employees set salary = salary * 1.1
-    where department_id = v_dep_id;
-    dbms_output.put_line('done');
-    exception
-    when no_data_found then
-        dbms_output.put_line('shiiet');
-
-END;
-
-
--- 3
-CREATE OR REPLACE FUNCTION b(p_dep_id departments.department_id%type)
-RETURN employees.salary%type
-IS
-diff employees.salary%type := 0;
+create or replace trigger country_guard 
+before insert on countries 
+for each row
 begin
-  SELECT MAX(SALARY) - MIN(SALARY) INTO diff from employees e JOIN departments d ON e.department_id = d.department_id;
-  return diff;
+  if :new.country_name is null then
+  :new.country_name := 'New name';
+  end if;
 end;
 
-SELECT department_id, diff(department_id) FROM departments where department_id = 30;
-
--- 4
-CREATE OR REPLACE TRIGGER trg_cnt
-BEFORE INSERT ON countries
-FOR EACH ROW
-begin
-  IF :new.country_name is null then
-    :new.country_name := 'Nowa nazwa';
-  END IF;
-end;
-
-
-
-
---1
-DECLARE
-CURSOR kursor (nr_dzialu HR.employees.department_id%TYPE) IS
-SELECT last_name FROM HR.employees WHERE department_id = nr_dzialu;
-nazwisko HR.employees.last_name%TYPE;
-numer_dzialu NUMBER := 30;
-BEGIN
-	OPEN kursor(numer_dzialu);
-	LOOP
-		FETCH kursor INTO nazwisko;
-		IF kursor%NOTFOUND
-		THEN
-			IF kursor%ROWCOUNT = 0
-			THEN
-				DBMS_OUTPUT.put_line('Podany dzial nie zatrudnia pracownikow');
-			ELSE 
-				DBMS_OUTPUT.put_line('Dzial '|| numer_dzialu || ' zatrudnia ' || kursor%ROWCOUNT || ' pracownikow.' );
-			END IF;
-			EXIT;
-		END IF;
-		DBMS_OUTPUT.put_line(nazwisko);
-	END LOOP;
-	CLOSE kursor;
-END;
-
---2
-CREATE OR REPLACE PROCEDURE procedura   
-(nr_dzialu HR.employees.department_id%TYPE) IS
-  nr HR.departments.department_id%TYPE;
-BEGIN
-  SELECT department_id INTO nr FROM HR.departments WHERE department_id = nr_dzialu;
-  UPDATE HR.employees SET salary = 1.1 * salary WHERE department_id = nr_dzialu;
-  DBMS_OUTPUT.put_line('Dzial '|| nr_dzialu || ' mial zwiekszone pensje o 10%.' );
-EXCEPTION
-  WHEN NO_DATA_FOUND
-  THEN
-	DBMS_OUTPUT.put_line('Dzial '|| nr_dzialu || ' nie zostal odnaleziony.' );
-END;
-
-
-DECLARE
-  nr_dzialu HR.employees.department_id%TYPE := 40;
-BEGIN
-  procedura(nr_dzialu);
-END;
-
-ROLLBACK;
-
-
---3
-CREATE OR REPLACE FUNCTION funkcja   
-(nr_dzialu HR.employees.department_id%TYPE)
-RETURN NUMBER IS
-min_pensja HR.employees.salary%TYPE;
-max_pensja HR.employees.salary%TYPE;
-BEGIN
-  SELECT MIN(salary) INTO min_pensja FROM HR.employees WHERE department_id = nr_dzialu;
-  SELECT MAX(salary) INTO max_pensja FROM HR.employees WHERE department_id = nr_dzialu;
-  RETURN max_pensja - min_pensja;
-END;
-
-SELECT department_id, funkcja(department_id) FROM HR.departments;
-
-ROLLBACK;
-
---4
-CREATE OR REPLACE TRIGGER wyzwalacz
-BEFORE insert ON HR.countries FOR EACH ROW
-WHEN (new.country_name IS NULL)
-BEGIN
-  :new.country_name := 'Nowa nazwa';
-END;
-
-SELECT * FROM HR.countries WHERE country_name = 'Nowa nazwa';
-INSERT INTO HR.countries VALUES ('NN', NULL, 3);
-SELECT * FROM HR.countries WHERE country_name = 'Nowa nazwa';
-
-ROLLBACK;
-
+insert into countries (country_id, region_id) values ('AA', 1);
+select * from countries where countryid = 'AA';

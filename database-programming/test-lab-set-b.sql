@@ -28,22 +28,21 @@ begin
   select count(*) into deps_count from departments where department_name = p_dep_name;
   if deps_count = 0 then
     raise e_no_dep_found;
+  else 
+    for emp in c_emps loop
+      update employees 
+      set salary = salary * 1.1
+      where employee_id = emp.employee_id;
+      emps_count := emps_count + 1;
+    end loop;
+    dbms_output.put_line('Salary raised for ' || emps_count || ' employee(s)'); 
   end if;
-
-  for emp in c_emps loop
-    update employees 
-    set salary = salary * 1.1
-    where employee_id = emp.employee_id;
-    emps_count := emps_count + 1;
-  end loop;
-
-  dbms_output.put_line('Salary raised for ' || emps_count || ' employee(s)'); 
-
 exception
   when e_no_dep_found then
     dbms_output.put_line('No department found'); 
 end;
 
+select * from employees where department_id = 90;
 exec salary_raise('Executive');
 exec salary_raise('Wrong department name');
 
@@ -69,6 +68,7 @@ exception
     return 0;
 end;
 
+select * from employees where department_id = 90;
 select dep_max_sal('Executive') from dual; 
 select dep_max_sal('Wrong department name') from dual; 
 
