@@ -1,6 +1,6 @@
-# SQL Tasks
+# Database tasks
 
-SQL tasks. Database Systems (2019) & Database Programming (2020).
+Database tasks wrom SQL and PL/SQL. Database Systems (2019) & Database Programming (2020).
 
 ## Getting Started
 
@@ -9,7 +9,7 @@ These instructions will get you a copy of the project up and running on your loc
 ### Cloning
 
 ```
-$ git clone https://github.com/msuliborski/sql-tasks
+$ git clone https://github.com/msuliborski/database-tasks
 ```
 
 ## Authors
@@ -19,6 +19,3 @@ $ git clone https://github.com/msuliborski/sql-tasks
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-
-
