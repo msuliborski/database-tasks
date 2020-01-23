@@ -21,7 +21,13 @@
 
 -- Note: No interface is required (except for standard database output).
 
-
+SELECT * FROM jobs;
+SELECT * FROM employees;
+SELECT * FROM guests;
+SELECT * FROM beds;
+SELECT * FROM rooms;
+SELECT * FROM bedsToRooms;
+SELECT * FROM reservations;
 
 CREATE TABLE jobs ( 
     job_id          NUMBER NOT NULL PRIMARY KEY, 
@@ -156,24 +162,16 @@ CREATE TABLE bedsToRooms (
 );
 
 INSERT INTO bedsToRooms VALUES (1, 1, 1);
-INSERT INTO bedsToRooms VALUES (1, 3, 1);
-
-INSERT INTO bedsToRooms VALUES (2, 4, 1);
-INSERT INTO bedsToRooms VALUES (2, 5, 2);
-
-INSERT INTO bedsToRooms VALUES (3, 1, 8);
-
-INSERT INTO bedsToRooms VALUES (4, 4,8);
-
-INSERT INTO bedsToRooms VALUES (5, 4, 1);
-
-INSERT INTO bedsToRooms VALUES (6, 4, 1);
-
-INSERT INTO bedsToRooms VALUES (7, 4, 2);
-
-INSERT INTO bedsToRooms VALUES (8, 6, 1);
-
-INSERT INTO bedsToRooms VALUES (9, 7, 1);
+INSERT INTO bedsToRooms VALUES (3, 1, 1);
+INSERT INTO bedsToRooms VALUES (4, 2, 1);
+INSERT INTO bedsToRooms VALUES (5, 2, 2);
+INSERT INTO bedsToRooms VALUES (1, 3, 8);
+INSERT INTO bedsToRooms VALUES (4, 4, 8);
+INSERT INTO bedsToRooms VALUES (4, 5, 1);
+INSERT INTO bedsToRooms VALUES (4, 6, 1);
+INSERT INTO bedsToRooms VALUES (4, 7, 2);
+INSERT INTO bedsToRooms VALUES (6, 8, 1);
+INSERT INTO bedsToRooms VALUES (7, 9, 1);
 
 
 
@@ -200,7 +198,7 @@ INSERT INTO reservations VALUES (2, TO_DATE('2019-12-14', 'yyyy-mm-dd'), TO_DATE
 INSERT INTO reservations VALUES (3, TO_DATE('2018-11-14', 'yyyy-mm-dd'), TO_DATE('2018-11-30', 'yyyy-mm-dd'), 0, 'paid', 7, 2);
 INSERT INTO reservations VALUES (4, TO_DATE('2019-12-14', 'yyyy-mm-dd'), TO_DATE('2019-12-30', 'yyyy-mm-dd'), 50, 'pending', 7, 2);
 
-INSERT INTO reservations VALUES (5, TO_DATE('2019-12-01', 'yyyy-mm-dd'), TO_DATE('2019-01-08', 'yyyy-mm-dd'), 0, 'pending', 1, 3);
+INSERT INTO reservations VALUES (5, TO_DATE('2019-12-01', 'yyyy-mm-dd'), TO_DATE('2020-01-08', 'yyyy-mm-dd'), 0, 'pending', 1, 3);
 
 INSERT INTO reservations VALUES (6, TO_DATE('2019-12-01', 'yyyy-mm-dd'), TO_DATE('2019-12-30', 'yyyy-mm-dd'), 0, 'pending', 3, 4);
 INSERT INTO reservations VALUES (7, TO_DATE('2019-12-01', 'yyyy-mm-dd'), TO_DATE('2019-12-30', 'yyyy-mm-dd'), 1000, 'pending', 4, 4);
@@ -211,12 +209,12 @@ INSERT INTO reservations VALUES (10, TO_DATE('2019-10-01', 'yyyy-mm-dd'), TO_DAT
 
 
 
-TODO: 
-    at least 3 procedures performing different operations should be defined (e.g. for adding, modification, and retrieving data from the database)
-        - checkIfRoomAvailable(check_in_date DATE, check_out_date DATE)
-        - addReservation(...)
-        - add_employee(...)
-        - ?...?
+-- TODO: 
+    --at least 3 procedures performing different operations should be defined (e.g. for adding, modification, and retrieving data from the database)
+        -- - checkIfRoomAvailable(check_in_date DATE, check_out_date DATE)
+        -- - addReservation(...)
+        -- - add_employee(...)
+        -- - ?...?
 
 
     create or replace procedure add_guest (p_first_name guests.first_name%type,
@@ -304,8 +302,8 @@ create or replace procedure add_employee (p_first_name employees.first_name%type
 
 
 
-    at least 10 SQL queries for data preview should be defined; aggregate functions and SQL clauses should be considered,
-        - ...
+    -- at least 10 SQL queries for data preview should be defined; aggregate functions and SQL clauses should be considered,
+        -- - ...
 
     -- count of unique guests renting rooms
     SELECT COUNT(*) AS NUM_OF_UNIQUE_GUESTS_RENTING_ROOMS FROM (SELECT DISTINCT guest_id FROM reservations); 
@@ -330,8 +328,8 @@ create or replace procedure add_employee (p_first_name employees.first_name%type
 
 
 
-    at least 2 functions that enable calculations should be defined
-        - ...
+    -- at least 2 functions that enable calculations should be defined
+        -- - ...
 
     create or replace function is_room_available (p_room_id number,
                                                         p_check_in_date date,
@@ -343,7 +341,7 @@ create or replace procedure add_employee (p_first_name employees.first_name%type
         where room_id = p_room_id;
     v_room_record c_room_cursor%rowtype;
     begin
-        v_is_available := 1;
+        v_is_available := 1; --true
         open c_room_cursor;
             loop
                 fetch c_room_cursor into v_room_record;
