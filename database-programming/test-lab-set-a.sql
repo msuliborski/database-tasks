@@ -23,7 +23,7 @@ end;
 -- W sekcji deklaratywnej procedury musi zostać zdefiniowany wyjątek, który musi zostać wygenerowany w ciele procedury i obsłużony w sekcji EXCEPTION procedury.
 create or replace procedure salary_raise(p_last_name employees.last_name%type) is
   e_no_emp_found exception;
-  emp_count number(4);
+  emp_count number(4) := 0;
 begin
   select count(*) into emp_count from employees where last_name = p_last_name;
   if emp_count = 0 then
@@ -47,8 +47,8 @@ exec salary_raise('Wrong last name');
 create or replace function dep_sum(p_dep_name departments.department_name%type) 
 return employees.salary%type is
   e_no_dep_found exception;
-  dep_count number(4);
-  dep_sum employees.salary%type;
+  dep_count number(4) := 0;
+  dep_sum employees.salary%type := 0;
 begin
   select count(*) into dep_count from departments where department_name = p_dep_name;
   if dep_count = 0 then
