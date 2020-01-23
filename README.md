@@ -1,6 +1,6 @@
 # Database tasks
 
-Database tasks wrom SQL and PL/SQL. Database Systems (2019) & Database Programming (2020).
+Database tasks from SQL and PL/SQL. Database Systems (2019) & Database Programming (2020).
 
 ## Getting Started
 
