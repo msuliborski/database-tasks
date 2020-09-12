@@ -1,10 +1,10 @@
 # Database tasks
 
-Database tasks from SQL and PL/SQL. Database Systems (2019) & Database Programming (2020).
+Database tasks from SQL and PL/SQL. Database Systems (2019) & Database Programming (2020) & Architecture and Administration of DBMS (2020)
 
-## Getting Started
+## Description
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+Repository contains all the work done at previously mentiond subjects
 
 ### Cloning
 
