@@ -15,6 +15,7 @@ $ git clone https://github.com/msuliborski/database-tasks
 ## Authors
 
 * **Michał Suliborski** - [msuliborski](https://github.com/msuliborski)
+* **Michał Kuśmidrowicz** - [ninjarlz](https://github.com/ninjarlz)
 
 ## License
 
